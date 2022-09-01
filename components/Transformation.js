@@ -2,8 +2,9 @@ import { Text, TextInput, View, Button, Image, ScrollView, FlatList } from 'reac
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useState, useEffect } from 'react'
 
-export default function Transformation({navigation, route, clearData}) {
+export default function Transformation({navigation, route, deletePhotos}) {
     const {transformationName, photos} = route.params
+
     return (
         <View>
             <FlatList
@@ -16,23 +17,14 @@ export default function Transformation({navigation, route, clearData}) {
                             <Image source={{uri: item}} 
                             style={{width:200, height:400, borderRadius:16}}
                             />
+                            <Button title='remove' onPress={() => deletePhotos(item, transformationName)}/>
                         </View>
                 }}
             />
-            <Button title='remove' onPress={() => clearData()}/>
             <Button title='Add Photo' onPress={() => navigation.navigate('Camera', {
-                transformationName: transformationName
+                transformationName: transformationName,
+                lastPhoto: photos.at(-1)
             })}/>
         </View>
     )
-//   return (
-//       <ScrollView>
-//         {photos && photos.map((photo) => {
-//             return (
-//                 <Image source={{uri : photo}} style={{ width:100, height:200}}/>
-//             )
-//         })}
-//         <Button title='remove' onPress={() => clearData()}/>
-//       </ScrollView>
-//   )
 }

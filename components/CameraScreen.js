@@ -4,10 +4,11 @@ import { Camera, CameraType } from 'expo-camera';
 import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Feather from '@expo/vector-icons/Feather'
+import { NavigationContainer } from '@react-navigation/native';
 
-export default function CameraScreen({route, addNewPhoto, lastPhoto}) {
+export default function CameraScreen({route, navigation, addNewPhoto}) {
 
-    const {transformationName} = route.params
+    const {transformationName, lastPhoto} = route.params
     const [hasCameraPermission, setHasCameraPermission] = useState(null)
     const [camera, setCamera] = useState(null)
     const [image, setImage] = useState(null)
@@ -24,7 +25,6 @@ export default function CameraScreen({route, addNewPhoto, lastPhoto}) {
           if(timerDisplay < 1){
             setTakingPicture(false)
             takePicture()
-            console.log('Taking Pic')
           }
           else{
             setTimerDisplay(prevCount => prevCount - 1)
@@ -127,9 +127,9 @@ export default function CameraScreen({route, addNewPhoto, lastPhoto}) {
                   size={72}
                   color={'white'}
                   onPress={() => {
-                    console.log(transformationName)
                     addNewPhoto(image, transformationName)
                     setImage(null)
+                    navigation.goBack()
                   }}
                 />
               </ImageBackground>

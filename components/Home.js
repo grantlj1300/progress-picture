@@ -1,12 +1,11 @@
 import { Button, Text, View, Image, StyleSheet, FlatList } from 'react-native'
 
 export default function Home({navigation, transformations, deleteTransformation}) {
-    console.log(transformations)
+console.log(transformations)
     return (
         <View style={styles.homeContainer}>
             <Button 
                 title='+ Add New Transformation'
-                //onPress={() => navigation.navigate('Camera')}
                 onPress={() => navigation.navigate('New Transformation')}
             />
             <FlatList
@@ -18,7 +17,7 @@ export default function Home({navigation, transformations, deleteTransformation}
                     return <View style={{marginHorizontal:50, justifyContent: 'center', alignItems:'center'}}>
                             <Text onPress={() => navigation.navigate('Transformation', {
                                 transformationName: item.transformationName,
-                                photos: item.photos
+                                photos: item.photos,
                             })}>{item.transformationName}</Text>
                             {/* <Image source={{uri: item.photos[0]}} 
                             style={{width:200, height:400, borderRadius:16}}

@@ -10,9 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 const Stack = createNativeStackNavigator()
 
 export default function App() {
-
   const [transformations, setTransformations] = useState([])
-  const [photos, setPhotos] = useState([])
+  console.log(transformations)
   
   useEffect(() => {
     getData()
@@ -25,15 +24,6 @@ export default function App() {
     storeTransformationData(newTransformations)
   }
 
-  const storeTransformationData = async(newTransformation) => {
-    try{
-        await AsyncStorage.setItem('transformations', JSON.stringify(newTransformation))
-    }
-    catch(e){
-        console.log(e)
-    }
-  }
-
   const deleteTransformation = async(transformationName) => {
     try{
       const newTransformations = transformations.filter((transformation) => {
@@ -44,6 +34,15 @@ export default function App() {
     }
     catch(e){
       console.log(e)
+    }
+  }
+
+  const storeTransformationData = async(newTransformation) => {
+    try{
+        await AsyncStorage.setItem('transformations', JSON.stringify(newTransformation))
+    }
+    catch(e){
+        console.log(e)
     }
   }
 
@@ -61,13 +60,18 @@ export default function App() {
     storeTransformationData(newTransformations)
   }
 
-  const storeData = async(images) => {
-    try{
-        await AsyncStorage.setItem('images', JSON.stringify(images))
-    }
-    catch(e){
-        console.log(e)
-    }
+  const deletePhotos = (removePhotos, transformationName) => {
+    const newTransformations = transformations.map((transformation) => {
+      if(transformation.transformationName === transformationName){
+        const newPhotos = transformation.photos.filter(photo => photo != removePhotos)
+        return {transformationName: transformationName, photos: newPhotos}
+      }
+      else{
+        return transformation
+      }
+    })
+    setTransformations(newTransformations)
+    storeTransformationData(newTransformations)
   }
 
   const getData = async() => {
@@ -80,25 +84,6 @@ export default function App() {
       catch(e){
         console.log(e)
       }
-    // try{
-    //     const images = await AsyncStorage.getItem('images')
-    //     if(images !== null) {
-    //       setPhotos(JSON.parse(images))
-    //     }
-    // }
-    // catch(e){
-    //     console.log(e)
-    // }
-  }
-
-  const clearData = async() => {
-    try{
-      await AsyncStorage.removeItem('images')
-      setPhotos([])
-    }
-    catch(e){
-      console.log(e)
-    }
   }
 
   return (
@@ -120,13 +105,13 @@ export default function App() {
         <Stack.Screen
           name='Transformation'
         >
-          {(props) => <TransformationScreen  clearData={clearData} {...props}/>}
+          {(props) => <TransformationScreen deletePhotos={deletePhotos} {...props}/>}
         </Stack.Screen>
 
         <Stack.Screen
           name='Camera'
         >
-          {(props) => <CameraScreen addNewPhoto={addNewPhoto} lastPhoto={photos.at(-1)} {...props}/>}
+          {(props) => <CameraScreen addNewPhoto={addNewPhoto} {...props}/>}
         </Stack.Screen>
 
       </Stack.Navigator>
