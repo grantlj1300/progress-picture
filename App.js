@@ -11,15 +11,54 @@ const Stack = createNativeStackNavigator()
 
 export default function App() {
 
+  const [transformations, setTransformations] = useState([])
   const [photos, setPhotos] = useState([])
+  
   useEffect(() => {
     getData()
-  }, [photos])
+  }, [])
 
-  const addNewPhoto = (newPic) => {
-    newPhotos = [...photos, newPic]
-    setPhotos(newPhotos)
-    storeData(newPhotos)
+  const addNewTransformation = (newTransformationName) => {
+    const newTransformations = [...transformations, 
+      {transformationName: newTransformationName, photos: []}]
+    setTransformations(newTransformations)
+    storeTransformationData(newTransformations)
+  }
+
+  const storeTransformationData = async(newTransformation) => {
+    try{
+        await AsyncStorage.setItem('transformations', JSON.stringify(newTransformation))
+    }
+    catch(e){
+        console.log(e)
+    }
+  }
+
+  const deleteTransformation = async(transformationName) => {
+    try{
+      const newTransformations = transformations.filter((transformation) => {
+        return transformation.transformationName !== transformationName
+      })
+      setTransformations(newTransformations)
+      await AsyncStorage.setItem('transformations', JSON.stringify(newTransformations))
+    }
+    catch(e){
+      console.log(e)
+    }
+  }
+
+  const addNewPhoto = (newPic, transformationName) => {
+    const newTransformations = transformations.map((transformation) => {
+      if(transformation.transformationName === transformationName){
+        const newPhotos = [...transformation.photos, newPic]
+        return {transformationName: transformationName, photos: newPhotos}
+      }
+      else{
+        return transformation
+      }
+    })
+    setTransformations(newTransformations)
+    storeTransformationData(newTransformations)
   }
 
   const storeData = async(images) => {
@@ -32,15 +71,24 @@ export default function App() {
   }
 
   const getData = async() => {
-    try{
-        const images = await AsyncStorage.getItem('images')
-        if(images !== null) {
-          setPhotos(JSON.parse(images))
+      try{
+        const transformations = await AsyncStorage.getItem('transformations')
+        if(transformations !== null) {
+          setTransformations(JSON.parse(transformations))
         }
-    }
-    catch(e){
+      }
+      catch(e){
         console.log(e)
-    }
+      }
+    // try{
+    //     const images = await AsyncStorage.getItem('images')
+    //     if(images !== null) {
+    //       setPhotos(JSON.parse(images))
+    //     }
+    // }
+    // catch(e){
+    //     console.log(e)
+    // }
   }
 
   const clearData = async() => {
@@ -59,24 +107,26 @@ export default function App() {
 
         <Stack.Screen
           name='Home'
-          component={HomeScreen}
-        />
+        >
+          {(props) => <HomeScreen transformations={transformations} deleteTransformation={deleteTransformation} {...props}/>}
+        </Stack.Screen>
 
         <Stack.Screen
           name='New Transformation'
-          component={NewTransformationFormScreen}
-        /> 
+        >
+          {(props) => <NewTransformationFormScreen addNewTransformation={addNewTransformation} {...props}/>}
+        </Stack.Screen> 
 
         <Stack.Screen
           name='Transformation'
         >
-          {(props) => <TransformationScreen photos={photos} clearData={clearData} {...props}/>}
+          {(props) => <TransformationScreen  clearData={clearData} {...props}/>}
         </Stack.Screen>
 
         <Stack.Screen
           name='Camera'
         >
-          {(props) => <CameraScreen addNewPhoto={addNewPhoto} {...props}/>}
+          {(props) => <CameraScreen addNewPhoto={addNewPhoto} lastPhoto={photos.at(-1)} {...props}/>}
         </Stack.Screen>
 
       </Stack.Navigator>

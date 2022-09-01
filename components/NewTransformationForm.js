@@ -1,12 +1,13 @@
 import { View, TextInput, StyleSheet, Button } from 'react-native'
 import { useState } from 'react';
 
-export default function NewTransformationForm({navigation}) {
+export default function NewTransformationForm({navigation, addNewTransformation}) {
 
     const [transformationTitle, setTransformationTitle] = useState('')
 
     function submitForm(){
         if(transformationTitle){
+            addNewTransformation(transformationTitle)
             navigation.navigate('Home')
         }
         else{
