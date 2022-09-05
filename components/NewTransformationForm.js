@@ -4,10 +4,15 @@ import { useState } from 'react';
 export default function NewTransformationForm({navigation, addNewTransformation}) {
 
     const [transformationTitle, setTransformationTitle] = useState('')
+    const [daysBetweenPhotos, setDaysBetweenPhotos] = useState('')
 
     function submitForm(){
+        if(daysBetweenPhotos < 1){
+            alert("Days between photos must be greater than 0!")
+            return
+        }
         if(transformationTitle){
-            addNewTransformation(transformationTitle)
+            addNewTransformation(transformationTitle, daysBetweenPhotos)
             navigation.navigate('Home')
         }
         else{
@@ -16,11 +21,18 @@ export default function NewTransformationForm({navigation, addNewTransformation}
     }
 
     return (
-        <View>
+        <View style={{paddingTop: 40}}>
             <TextInput
                 style={styles.inputContainer}
                 placeholder="Title of Transformation"
                 onChangeText={(newTitle) => setTransformationTitle(newTitle)}
+            />
+            <TextInput
+                style={styles.inputContainer}
+                keyboardType='number-pad'
+                contextMenuHidden={true}
+                placeholder="Days Between Photos"
+                onChangeText={(newDays) => setDaysBetweenPhotos(newDays)}
             />
             <Button
                 title="Submit"

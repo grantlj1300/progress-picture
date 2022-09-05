@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react'
 import { StyleSheet, Text, View, ImageBackground, Image } from 'react-native';
-import { Camera, CameraType } from 'expo-camera';
+import { Camera } from 'expo-camera';
 import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Feather from '@expo/vector-icons/Feather'
-import { NavigationContainer } from '@react-navigation/native';
 
-export default function CameraScreen({route, navigation, addNewPhoto}) {
+export default function CameraScreen({route, addNewPhoto, navigation}) {
 
-    const {transformationName, lastPhoto} = route.params
+    const {name, lastPhoto, addToCurrentPhotos} = route.params
     const [hasCameraPermission, setHasCameraPermission] = useState(null)
     const [camera, setCamera] = useState(null)
     const [image, setImage] = useState(null)
@@ -56,7 +55,7 @@ export default function CameraScreen({route, navigation, addNewPhoto}) {
           )
         }
         setImage(data.uri)
-        //addNewPhoto(data.uri)
+        setDisplayPrevious(false)
       }
     }
   
@@ -66,21 +65,29 @@ export default function CameraScreen({route, navigation, addNewPhoto}) {
 
     return (
         <View style={{flex: 1}}>
-          
             {
-            (!image && <View style={styles.cameraContainer}>
+            (!image && 
+            <View style={styles.cameraContainer}>
               <Camera
                 ref={ref => setCamera(ref)}
                 style={styles.innerContainer}
                 type={type}
               >
-                <View style={{flex: 1, flexDirection: 'row', justifyContent:'space-between'}}>
-                  <Ionicons
-                    name='timer-outline'
-                    size={32}
-                    color={'white'}
-                    onPress={() => setTimerValue(timerValue === 3 ? 0 : 3)}
-                  />
+                <View style={{flex: 1, flexDirection: 'row', justifyContent:'space-between', paddingTop: 40}}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Ionicons
+                      name={timerValue === 0 ? 'timer-outline' : 'timer'}
+                      size={32}
+                      color={'white'}
+                      onPress={() => setTimerValue(timerValue === 3 ? 0 : 3)}
+                    >
+                    </Ionicons>
+                    <View style={{backgroundColor: 'white', borderRadius: 15, alignItems: 'center', padding: 10}}>
+                        <Text style={{fontSize: 20}}>0s</Text>
+                        <Text style={{fontSize: 20}}>3s</Text>
+                        <Text style={{fontSize: 20}}>10s</Text>
+                    </View>
+                  </View>
                   <Ionicons
                     name={displayPrevious ? 'eye-outline' : 'eye-off-outline'}
                     size={32}
@@ -100,7 +107,10 @@ export default function CameraScreen({route, navigation, addNewPhoto}) {
                 {lastPhoto && displayPrevious &&
                 <Image source={{uri : lastPhoto}} 
                 style={{width:100, height: 100, opacity: 0.3}}/>}
-                <Text style={{color:'white', fontSize:40}}>{timerDisplay || timerValue}</Text>
+                
+                {takingPicture ? 
+                <Text style={{color: 'white', fontSize: 72, alignSelf: 'center', paddingBottom: 20}}>{timerDisplay || timerValue}</Text> 
+                :
                 <Feather 
                   name='circle' 
                   size={72} 
@@ -110,33 +120,50 @@ export default function CameraScreen({route, navigation, addNewPhoto}) {
                     setTimerDisplay(timerValue)
                   }}
                   style={{alignSelf: 'center', paddingBottom: 20}}
-                />
+                />}
               </Camera>
             </View>
-            ) ||
-            (image && <View style={styles.cameraContainer}>
-              <ImageBackground source={{uri: image}} style={{flex: 1}}>
-                <Feather 
-                  name='x' 
-                  size={72} 
-                  color={'white'}
-                  onPress={() => setImage(null)}
-                />
-                <Ionicons 
-                  name='checkmark-circle-outline'
-                  size={72}
-                  color={'white'}
-                  onPress={() => {
-                    addNewPhoto(image, transformationName)
-                    setImage(null)
-                    navigation.goBack()
-                  }}
-                />
+            ) 
+            
+            ||
+
+            (image && 
+            <View style={styles.cameraContainer}>
+              <ImageBackground source={{uri: image}} style={styles.innerContainer}>
+                <ImageBackground 
+                  source={displayPrevious ? {uri: lastPhoto} : {uri: image}}
+                  style={{width:'100%', height: '100%'}}
+                  imageStyle={{opacity:0.3}}
+                >
+                  <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingTop: 40}}>
+                    <Feather 
+                      name='x' 
+                      size={32} 
+                      color={'white'}
+                      onPress={() => setImage(null)}
+                    />
+                    <Ionicons
+                        name={displayPrevious ? 'eye-outline' : 'eye-off-outline'}
+                        size={32}
+                        color={'white'}
+                        onPress={() => setDisplayPrevious(prevDisplay => !prevDisplay)}
+                      />
+                    <Ionicons 
+                      name='checkmark-circle-outline'
+                      size={32}
+                      color={'white'}
+                      onPress={() => {
+                        addNewPhoto(image, name)
+                        addToCurrentPhotos(image)
+                        setImage(null)
+                        navigation.goBack()
+                      }}
+                    />
+                  </View>
+                </ImageBackground>
               </ImageBackground>
             </View>
-            )
-            }
-          
+            )}
         </View>
       );
 }
@@ -148,7 +175,6 @@ const styles = StyleSheet.create({
     },
     innerContainer: {
       flex: 1,
-      justifyContent: 'space-between',
       padding: 10
     }
   });

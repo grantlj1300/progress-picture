@@ -1,30 +1,72 @@
-import { Text, TextInput, View, Button, Image, ScrollView, FlatList } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useState, useEffect } from 'react'
+import { View, Button, Image, FlatList, StyleSheet, Text } from 'react-native'
+import { useState } from 'react'
+import Feather from '@expo/vector-icons/Feather'
+//import { FFmpegKit } from 'ffmpeg-kit-react-native'
 
-export default function Transformation({navigation, route, deletePhotos}) {
-    const {transformationName, photos} = route.params
+export default function Transformation({navigation, deletePhotos, route}) {
+    const {name, photoObjects} = route.params
+    const [currentPhotoObjects, setCurrentPhotoObjects] = useState(photoObjects)
+
+    const addToCurrentPhotos = (newPic) => {
+        const today = new Date()
+        const currDate = parseInt(today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear()
+        setCurrentPhotoObjects(prevPhotos => [{image: newPic, date: currDate}, ...prevPhotos])
+    }
+
+    function createVideo(){
+        // const createMe = '-i ' + currentPhotoObjects[0].image + ' -c:v mpeg4 output.mp4'
+        // FFmpegKit.execute(createMe).then(async(session) =>{
+        //     const logs = await session.getOutput()
+        //     console.log(logs)
+            
+        // })
+    }
 
     return (
-        <View>
+        <View style={styles.transformationContainer}>
+            <Feather 
+                name='plus-circle' 
+                size={36} 
+                color={'gray'}
+                onPress={() => navigation.navigate('Camera', {
+                    name: name,
+                    lastPhoto: currentPhotoObjects.at(-1)?.image,
+                    addToCurrentPhotos: addToCurrentPhotos
+                })}
+                style={{padding: 10, paddingTop: 40, alignSelf:'flex-end'}}
+            />
             <FlatList
-                data={photos}
+                data={currentPhotoObjects}
                 keyExtractor={(_, index) => index.toString()}
                 horizontal
-                pagingEnabled
+                showsHorizontalScrollIndicator={false}
                 renderItem={({item}) => {
-                    return <View style={{marginHorizontal:50, justifyContent: 'center', alignItems:'center'}}>
-                            <Image source={{uri: item}} 
+                    return (
+                        <View style={{marginHorizontal: 15, justifyContent: 'center', alignItems:'center'}}>
+                            <Image source={{uri: item.image}} 
                             style={{width:200, height:400, borderRadius:16}}
                             />
-                            <Button title='remove' onPress={() => deletePhotos(item, transformationName)}/>
+                            <Text>{item.date}</Text>
+                            <Button title='remove' onPress={() => {
+                                setCurrentPhotoObjects((prevPhotos) => prevPhotos.filter((photo) => photo.image !== item.image))
+                                deletePhotos(item.image, name)
+                            }}/>
                         </View>
+                    )
                 }}
             />
-            <Button title='Add Photo' onPress={() => navigation.navigate('Camera', {
-                transformationName: transformationName,
-                lastPhoto: photos.at(-1)
-            })}/>
+            <Button
+                title='Export Video'
+                onPress={() => createVideo()}
+            />
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    transformationContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    }
+})
