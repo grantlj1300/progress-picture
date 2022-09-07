@@ -18,49 +18,49 @@ export default function CameraScreen({route, addNewPhoto, navigation}) {
     const [takingPicture, setTakingPicture] = useState(false)
 
     useEffect(() => {
-      let intervalId
-      if(takingPicture){
-        intervalId = setInterval(() => {
-          if(timerDisplay < 1){
-            setTakingPicture(false)
-            takePicture()
-          }
-          else{
-            setTimerDisplay(prevCount => prevCount - 1)
-            console.log(timerDisplay)
-          }
-        }, 1000);
-      }
-      else {
-        clearInterval(intervalId)
-      }
-      return () => clearInterval(intervalId)
+        let intervalId
+        if(takingPicture){
+            intervalId = setInterval(() => {
+            if(timerDisplay < 1){
+                setTakingPicture(false)
+                takePicture()
+            }
+            else{
+                setTimerDisplay(prevCount => prevCount - 1)
+                console.log(timerDisplay)
+            }
+            }, 1000);
+        }
+        else {
+            clearInterval(intervalId)
+        }
+        return () => clearInterval(intervalId)
     }, [takingPicture, timerDisplay])
       
     useEffect(() => {
-      (async() => {
-        const cameraStatus = await Camera.requestCameraPermissionsAsync()
-        setHasCameraPermission(cameraStatus.status === 'granted')
-      })()
+        (async() => {
+            const cameraStatus = await Camera.requestCameraPermissionsAsync()
+            setHasCameraPermission(cameraStatus.status === 'granted')
+        })()
     }, [])
     
     const takePicture = async() => {
-      if(camera){
-        let data = await camera.takePictureAsync(null)
-        if(type === Camera.Constants.Type.front){
-          data = await manipulateAsync(
-            data.uri, 
-            [ {rotate: 180} , {flip: FlipType.Vertical} ], 
-            { compress: 1, format: SaveFormat.PNG }
-          )
+        if(camera){
+            let data = await camera.takePictureAsync(null)
+            if(type === Camera.Constants.Type.front){
+            data = await manipulateAsync(
+                data.uri, 
+                [ {rotate: 180} , {flip: FlipType.Vertical} ], 
+                { compress: 1, format: SaveFormat.PNG }
+            )
+            }
+            setImage(data.uri)
+            setDisplayPrevious(false)
         }
-        setImage(data.uri)
-        setDisplayPrevious(false)
-      }
     }
   
     if(hasCameraPermission === false){
-      return <Text>No Camera Access</Text>
+        return <Text>No Camera Access</Text>
     }
 
     return (
@@ -68,60 +68,60 @@ export default function CameraScreen({route, addNewPhoto, navigation}) {
             {
             (!image && 
             <View style={styles.cameraContainer}>
-              <Camera
-                ref={ref => setCamera(ref)}
-                style={styles.innerContainer}
-                type={type}
-              >
-                <View style={{flex: 1, flexDirection: 'row', justifyContent:'space-between', paddingTop: 40}}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Ionicons
-                      name={timerValue === 0 ? 'timer-outline' : 'timer'}
-                      size={32}
-                      color={'white'}
-                      onPress={() => setTimerValue(timerValue === 3 ? 0 : 3)}
-                    >
-                    </Ionicons>
-                    <View style={{backgroundColor: 'white', borderRadius: 15, alignItems: 'center', padding: 10}}>
-                        <Text style={{fontSize: 20}}>0s</Text>
-                        <Text style={{fontSize: 20}}>3s</Text>
-                        <Text style={{fontSize: 20}}>10s</Text>
+                <Camera
+                    ref={ref => setCamera(ref)}
+                    style={styles.innerContainer}
+                    type={type}
+                >
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent:'space-between', paddingTop: 40}}>
+                    <View style={{flexDirection: 'column'}}>
+                        <Ionicons
+                        name={timerValue === 0 ? 'timer-outline' : 'timer'}
+                        size={32}
+                        color={'white'}
+                        onPress={() => setTimerValue(timerValue === 3 ? 0 : 3)}
+                        >
+                        </Ionicons>
+                        <View style={{backgroundColor: 'white', borderRadius: 15, alignItems: 'center', padding: 10}}>
+                            <Text style={{fontSize: 20}}>0s</Text>
+                            <Text style={{fontSize: 20}}>3s</Text>
+                            <Text style={{fontSize: 20}}>10s</Text>
+                        </View>
                     </View>
-                  </View>
-                  <Ionicons
-                    name={displayPrevious ? 'eye-outline' : 'eye-off-outline'}
-                    size={32}
-                    color={'white'}
-                    onPress={() => setDisplayPrevious(prevDisplay => !prevDisplay)}
-                  />
-                  <Ionicons 
-                    name='camera-reverse-outline' 
-                    size={32} 
+                    <Ionicons
+                        name={displayPrevious ? 'eye-outline' : 'eye-off-outline'}
+                        size={32}
+                        color={'white'}
+                        onPress={() => setDisplayPrevious(prevDisplay => !prevDisplay)}
+                    />
+                    <Ionicons 
+                        name='camera-reverse-outline' 
+                        size={32} 
+                        color={'white'}
+                        onPress={() => {
+                        setType(type === Camera.Constants.Type.back 
+                        ? Camera.Constants.Type.front : Camera.Constants.Type.back)
+                        }}
+                    />
+                    </View>
+                    {lastPhoto && displayPrevious &&
+                    <Image source={{uri : lastPhoto}} 
+                    style={{width:100, height: 100, opacity: 0.3}}/>}
+                    
+                    {takingPicture ? 
+                    <Text style={{color: 'white', fontSize: 72, alignSelf: 'center', paddingBottom: 20}}>{timerDisplay || timerValue}</Text> 
+                    :
+                    <Feather 
+                    name='circle' 
+                    size={72} 
                     color={'white'}
                     onPress={() => {
-                      setType(type === Camera.Constants.Type.back 
-                      ? Camera.Constants.Type.front : Camera.Constants.Type.back)
+                        setTakingPicture(true)
+                        setTimerDisplay(timerValue)
                     }}
-                  />
-                </View>
-                {lastPhoto && displayPrevious &&
-                <Image source={{uri : lastPhoto}} 
-                style={{width:100, height: 100, opacity: 0.3}}/>}
-                
-                {takingPicture ? 
-                <Text style={{color: 'white', fontSize: 72, alignSelf: 'center', paddingBottom: 20}}>{timerDisplay || timerValue}</Text> 
-                :
-                <Feather 
-                  name='circle' 
-                  size={72} 
-                  color={'white'}
-                  onPress={() => {
-                    setTakingPicture(true)
-                    setTimerDisplay(timerValue)
-                  }}
-                  style={{alignSelf: 'center', paddingBottom: 20}}
-                />}
-              </Camera>
+                    style={{alignSelf: 'center', paddingBottom: 20}}
+                    />}
+                </Camera>
             </View>
             ) 
             
@@ -129,52 +129,52 @@ export default function CameraScreen({route, addNewPhoto, navigation}) {
 
             (image && 
             <View style={styles.cameraContainer}>
-              <ImageBackground source={{uri: image}} style={styles.innerContainer}>
-                <ImageBackground 
-                  source={displayPrevious ? {uri: lastPhoto} : {uri: image}}
-                  style={{width:'100%', height: '100%'}}
-                  imageStyle={{opacity:0.3}}
-                >
-                  <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingTop: 40}}>
-                    <Feather 
-                      name='x' 
-                      size={32} 
-                      color={'white'}
-                      onPress={() => setImage(null)}
-                    />
-                    <Ionicons
-                        name={displayPrevious ? 'eye-outline' : 'eye-off-outline'}
+                <ImageBackground source={{uri: image}} style={styles.innerContainer}>
+                    <ImageBackground 
+                    source={displayPrevious ? {uri: lastPhoto} : {uri: image}}
+                    style={{width:'100%', height: '100%'}}
+                    imageStyle={{opacity:0.3}}
+                    >
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingTop: 40}}>
+                        <Feather 
+                        name='x' 
+                        size={32} 
+                        color={'white'}
+                        onPress={() => setImage(null)}
+                        />
+                        <Ionicons
+                            name={displayPrevious ? 'eye-outline' : 'eye-off-outline'}
+                            size={32}
+                            color={'white'}
+                            onPress={() => setDisplayPrevious(prevDisplay => !prevDisplay)}
+                        />
+                        <Ionicons 
+                        name='checkmark-circle-outline'
                         size={32}
                         color={'white'}
-                        onPress={() => setDisplayPrevious(prevDisplay => !prevDisplay)}
-                      />
-                    <Ionicons 
-                      name='checkmark-circle-outline'
-                      size={32}
-                      color={'white'}
-                      onPress={() => {
-                        addNewPhoto(image, name)
-                        addToCurrentPhotos(image)
-                        setImage(null)
-                        navigation.goBack()
-                      }}
-                    />
-                  </View>
+                        onPress={() => {
+                            addNewPhoto(image, name)
+                            addToCurrentPhotos(image)
+                            setImage(null)
+                            navigation.goBack()
+                        }}
+                        />
+                    </View>
+                    </ImageBackground>
                 </ImageBackground>
-              </ImageBackground>
             </View>
             )}
         </View>
-      );
+    );
 }
 
 const styles = StyleSheet.create({
     cameraContainer: {
-      flex: 1,
-      flexDirection: 'column'
+        flex: 1,
+        flexDirection: 'column'
     },
     innerContainer: {
-      flex: 1,
-      padding: 10
+        flex: 1,
+        padding: 10
     }
   });
