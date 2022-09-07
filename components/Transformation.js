@@ -98,7 +98,7 @@ export default function Transformation({navigation, deletePhotos, route}) {
                     style={styles.footerItem}
                     onPress={() => navigation.navigate('Camera', {
                         name: name,
-                        lastPhoto: currentPhotoObjects.at(-1)?.image,
+                        lastPhoto: currentPhotoObjects.at(0)?.image,
                         addToCurrentPhotos: addToCurrentPhotos
                     })}
                 >
