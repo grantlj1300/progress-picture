@@ -6,6 +6,7 @@ import * as Notifications from 'expo-notifications'
 import HomeScreen from './components/Home'
 import CameraScreen from './components/CameraScreen'
 import TransformationScreen from "./components/Transformation";
+import VideoScreen from "./components/VideoScreen";
 import * as FileSystem from 'expo-file-system'
 import { StatusBar } from "expo-status-bar";
 
@@ -216,6 +217,12 @@ export default function App() {
             name='Camera'
             >
             {(props) => <CameraScreen addNewPhoto={addNewPhoto} {...props}/>}
+            </Stack.Screen>
+
+            <Stack.Screen
+            name='Video'
+            >
+            {(props) => <VideoScreen  {...props}/>}
             </Stack.Screen>
 
         </Stack.Navigator>
