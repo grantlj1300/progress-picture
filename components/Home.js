@@ -7,7 +7,8 @@ import {
     ImageBackground, 
     StyleSheet, 
     TouchableOpacity,
-    Alert } from 'react-native'
+    Alert,
+    SafeAreaView } from 'react-native'
 import NewTransformationModal from './NewTransformationForm'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Feather from '@expo/vector-icons/Feather'
@@ -161,8 +162,10 @@ export default function Home({navigation, transformations, deleteTransformation,
             </View>
             :
             <View style={styles.previewContainer}>
-                <Text>No Transformations</Text>
-                <Image source={require('../assets/images/question.png')} style={{ marginTop: 50 }}/>
+                <View style={{alignItems: 'center'}}>
+                    {generateCards([])}
+                    <Text style={{fontWeight: 'bold'}}>No Collections</Text>
+                </View>
             </View>
             }
 
@@ -179,7 +182,6 @@ export default function Home({navigation, transformations, deleteTransformation,
                 </TouchableOpacity>
                 <TouchableOpacity 
                     style={styles.footerItem}
-                    //onPress={() => navigation.navigate('New Transformation')}
                     onPress={() => handleCreateTransformationChange()}
                 >
                     <Feather 

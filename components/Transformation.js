@@ -10,6 +10,7 @@ import Carousel from 'react-native-snap-carousel'
 import { useState } from 'react'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Feather from '@expo/vector-icons/Feather'
+import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import * as FileSystem from 'expo-file-system'
 
 export default function Transformation({navigation, deletePhotos, route}) {
@@ -30,6 +31,7 @@ export default function Transformation({navigation, deletePhotos, route}) {
             style={styles.transformationContainer}
         >
             <View style={styles.photoBlockContainer}>
+                {currentPhotoObjects.length > 0 ?
                 <Carousel
                     layout='default'
                     data={currentPhotoObjects}
@@ -61,7 +63,29 @@ export default function Transformation({navigation, deletePhotos, route}) {
                             </View>
                         )
                     }}
-                />
+                /> 
+                :
+                <View style={{alignItems: 'center'}}>
+                    <View 
+                        style={ 
+                            { justifyContent: 'center', 
+                            borderWidth: 1, borderRadius: 20,
+                            width: 250, 
+                            height: 500, 
+                            marginHorizontal: 25,
+                            marginVertical: 50,
+                         }}
+                    >
+                        <MaterialIcons 
+                            name='insert-photo' 
+                            size={250} 
+                            color={'black'}
+                        />
+                        
+                    </View>
+                    <Text>No Photos</Text>
+                </View>
+                }
             </View>
 
             <View style={styles.footerContainer}>
