@@ -10,7 +10,8 @@ import Carousel from 'react-native-snap-carousel'
 import { useState } from 'react'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Feather from '@expo/vector-icons/Feather'
-//import { FFmpegKit } from 'ffmpeg-kit-react-native'
+import ImagesToVideo from 'react-native-images-to-video'
+import * as FileSystem from 'expo-file-system'
 
 export default function Transformation({navigation, deletePhotos, route}) {
 
@@ -24,13 +25,20 @@ export default function Transformation({navigation, deletePhotos, route}) {
         setCurrentPhotoObjects(prevPhotos => [{image: newPic, date: currDate}, ...prevPhotos])
     }
 
-    function createVideo(){
-        // const createMe = '-i ' + currentPhotoObjects[0].image + ' -c:v mpeg4 output.mp4'
-        // FFmpegKit.execute(createMe).then(async(session) =>{
-        //     const logs = await session.getOutput()
-        //     console.log(logs)
-            
-        // })
+    
+    const createVideo = async() => {
+        try{
+            const videoURL = await ImagesToVideo.render({
+                fileName: 'My Video',
+                screenTimePerImage: 3,
+                width:100,
+                height:100,
+                absolutePaths: [currentPhotoObjects[0].image]
+            })
+        }
+        catch(e){
+            console.log(e)
+        }
     }
 
     return (
@@ -110,7 +118,7 @@ export default function Transformation({navigation, deletePhotos, route}) {
                 </TouchableOpacity>
                 <TouchableOpacity 
                     style={styles.footerItem}
-                    onPress={() => createVideo()}
+                    onPress={() => createVideo()} 
                 >
                     <Ionicons 
                         name='ios-videocam-outline' 

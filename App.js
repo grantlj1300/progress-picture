@@ -6,8 +6,7 @@ import * as Notifications from 'expo-notifications'
 import HomeScreen from './components/Home'
 import CameraScreen from './components/CameraScreen'
 import TransformationScreen from "./components/Transformation";
-import NewTransformationFormScreen from "./components/NewTransformationForm";
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as FileSystem from 'expo-file-system'
 import { StatusBar } from "expo-status-bar";
 
 const Stack = createNativeStackNavigator()
@@ -30,8 +29,43 @@ export default function App() {
     const [transformations, setTransformations] = useState([])
     
     useEffect(() => {
-        getData()
+        getTransformationData()
     }, [])
+
+    // useEffect(async() => {
+    //     try{
+    //         const dir = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory)
+    //         console.log(dir)
+    //     }
+    //     catch(e){
+    //         console.log(e)
+    //     }
+    // }, [])
+
+    const getTransformationData = async() => {
+        const { exists } = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'transformations.json')
+        if(!exists){
+            await FileSystem.writeAsStringAsync(FileSystem.documentDirectory + 'transformations.json', JSON.stringify(transformations))
+        }
+        try{
+            const transformationData = await FileSystem.readAsStringAsync(FileSystem.documentDirectory + 'transformations.json')
+            if(transformationData !== null){
+                setTransformations(JSON.parse(transformationData))
+            }
+        }
+        catch(e){
+            console.log(e)
+        }
+    }
+
+    const storeTransformationData = async(newTransformation) => {
+        try{
+            await FileSystem.writeAsStringAsync(FileSystem.documentDirectory + 'transformations.json', JSON.stringify(newTransformation))
+        }
+        catch(e){
+            console.log(e)
+        }
+    }
 
     useEffect(() => {
         registerForPushNotifications().then(token => setExpoPushToken(token))
@@ -71,7 +105,7 @@ export default function App() {
             // return;
         }
         token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log(token);
+        //console.log(token);
 
         return token;
     }
@@ -112,25 +146,11 @@ export default function App() {
     }
 
     const deleteTransformation = async(transformationName) => {
-        try{
         const newTransformations = transformations.filter((transformation) => {
             return transformation.name !== transformationName
         })
         setTransformations(newTransformations)
-        await AsyncStorage.setItem('transformations', JSON.stringify(newTransformations))
-        }
-        catch(e){
-        console.log(e)
-        }
-    }
-
-    const storeTransformationData = async(newTransformation) => {
-        try{
-            await AsyncStorage.setItem('transformations', JSON.stringify(newTransformation))
-        }
-        catch(e){
-            console.log(e)
-        }
+        storeTransformationData(newTransformations)
     }
 
     const addNewPhoto = (newPic, transformationName) => {
@@ -161,18 +181,6 @@ export default function App() {
         })
         setTransformations(newTransformations)
         storeTransformationData(newTransformations)
-    }
-
-    const getData = async() => {
-        try{
-            const transformations = await AsyncStorage.getItem('transformations')
-            if(transformations !== null) {
-            setTransformations(JSON.parse(transformations))
-            }
-        }
-        catch(e){
-            console.log(e)
-        }
     }
 
     return (
