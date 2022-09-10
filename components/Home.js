@@ -1,5 +1,4 @@
 import { 
-    Modal, 
     Text,
     TextInput, 
     View, 
@@ -144,17 +143,18 @@ export default function Home({navigation, transformations, deleteTransformation,
                                     )
                                 }
                             />}
-                            <TouchableOpacity onPress={() => !editing && navigation.navigate('Transformation', {
-                                name: item.name,
-                                daysBetweenPhotos: item.daysBetweenPhotos,
-                                startDate: item.startDate,
-                                photoObjects: item.photoObjects
-                            })} 
+                            <TouchableOpacity 
+                                onPress={() => !editing && navigation.navigate('Transformation', {
+                                    name: item.name,
+                                    daysBetweenPhotos: item.daysBetweenPhotos,
+                                    startDate: item.startDate,
+                                    photoObjects: item.photoObjects
+                                })} 
                                 style={{alignItems:'center'}}
                             >
                                 {generateCards(item.photoObjects.slice(0, 3))}
-                                <Text style={{fontWeight: 'bold'}}>{item.name}</Text>
-                                <Text>Began: {item.startDate}</Text>
+                                <Text style={{fontWeight: 'bold', marginBottom: 10}}>{item.name}</Text>
+                                <Text>Created: {item.startDate}</Text>
                             </TouchableOpacity>
                         </View>
                     )}}
@@ -172,6 +172,7 @@ export default function Home({navigation, transformations, deleteTransformation,
             <View style={styles.footerContainer}>
                 <TouchableOpacity
                     style={styles.footerItem}
+                    activeOpacity={1}
                     onPress={() => setEditing(prevStatus => !prevStatus)}
                 >
                     <Feather 
@@ -182,6 +183,7 @@ export default function Home({navigation, transformations, deleteTransformation,
                 </TouchableOpacity>
                 <TouchableOpacity 
                     style={styles.footerItem}
+                    activeOpacity={1}
                     onPress={() => handleCreateTransformationChange()}
                 >
                     <Feather 

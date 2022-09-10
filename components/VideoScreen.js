@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 
 export default function VideoScreen({route, navigation}) {
 
-    const { photos } = route.params
+    const { photos, millisecondsPerPhoto } = route.params
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
     const [playingVideo, setPlayingVideo] = useState(false)
 
@@ -19,7 +19,7 @@ export default function VideoScreen({route, navigation}) {
                     setCurrentPhotoIndex(0)
                     setPlayingVideo(false)
                 }
-            }, 200);
+            }, millisecondsPerPhoto);
         }
         else {
             clearInterval(intervalId)

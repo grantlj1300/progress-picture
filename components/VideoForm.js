@@ -1,52 +1,42 @@
 import { View, TextInput, StyleSheet, Modal, Button } from 'react-native'
 import { useState } from 'react';
 
-export default function NewTransformationForm({ creatingNewTransformation, handleCreateTransformationChange, addNewTransformation }) {
+export default function VideoForm({ videoFormChanging, handleVideoFormChange, createVideo }) {
 
-    const [transformationTitle, setTransformationTitle] = useState('')
-    const [daysBetweenPhotos, setDaysBetweenPhotos] = useState('')
+    const [secondsPerPhoto, setSecondsPerPhoto] = useState(0)
 
     function submitForm(){
-        if(daysBetweenPhotos < 1){
-            alert("Days between photos must be greater than 0!")
+        if(secondsPerPhoto <= 0){
+            alert("Seconds Per Photo must be greater than 0!")
             return
         }
-        if(transformationTitle){
-            addNewTransformation(transformationTitle, daysBetweenPhotos)
-            handleCreateTransformationChange()
-        }
-        else{
-            alert("Enter a title!")
-        }
+        console.log(secondsPerPhoto)
+        handleVideoFormChange()
+        createVideo(secondsPerPhoto)
     }
 
     return (
         <Modal
             animationType='fade'
-            visible={creatingNewTransformation}
+            visible={videoFormChanging}
             transparent={true}
-            onRequestClose={() => handleCreateTransformationChange()}
+            onRequestClose={() => handleVideoFormChange()}
         >
             <View style={{backgroundColor: '#00000080', flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
                 <View style={{backgroundColor: '#fff', padding: 20, width: 300, height: 300, justifyContent: 'space-between'}}>
                     <View>
                         <TextInput
                             style={styles.inputContainer}
-                            placeholder="Title of Transformation"
-                            onChangeText={(newTitle) => setTransformationTitle(newTitle)}
-                        />
-                        <TextInput
-                            style={styles.inputContainer}
-                            keyboardType='number-pad'
+                            keyboardType='numeric'
                             contextMenuHidden={true}
-                            placeholder="Days Between Photos"
-                            onChangeText={(newDays) => setDaysBetweenPhotos(newDays)}
+                            placeholder="Seconds Per Photo"
+                            onChangeText={(seconds) => setSecondsPerPhoto(seconds)}
                         />
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
                         <Button
                             title='Cancel'
-                            onPress={() => handleCreateTransformationChange()}
+                            onPress={() => handleVideoFormChange()}
                         />
                         <Button
                             title='Submit'
@@ -66,4 +56,4 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         padding: 10
     }
-  });
+})

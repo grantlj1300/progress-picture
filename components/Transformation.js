@@ -7,17 +7,29 @@ import {
     ImageBackground, 
     TouchableOpacity } from 'react-native'
 import Carousel from 'react-native-snap-carousel'
+import VideoForm from './VideoForm'
 import { useState } from 'react'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Feather from '@expo/vector-icons/Feather'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-import * as FileSystem from 'expo-file-system'
 
 export default function Transformation({navigation, deletePhotos, route}) {
 
     const {name, photoObjects} = route.params
     const [currentPhotoObjects, setCurrentPhotoObjects] = useState(photoObjects)
+    const [videoFormChanging, setVideoFormChanging] = useState(false)
     const [editing, setEditing] = useState(false)
+
+    const handleVideoFormChange = () => {
+        setVideoFormChanging(prevStatus => !prevStatus)
+    }
+
+    const createVideo = (secondsPerPhoto) => {
+        navigation.navigate('Video', {
+            photos: currentPhotoObjects.map(photo => photo.image),
+            milliSecondsPerPhoto: secondsPerPhoto * 1000
+        })
+    }
 
     const addToCurrentPhotos = (newPic) => {
         const today = new Date()
@@ -30,6 +42,11 @@ export default function Transformation({navigation, deletePhotos, route}) {
             source={require('../assets/images/spotlight-background.png')}
             style={styles.transformationContainer}
         >
+            <VideoForm 
+                videoFormChanging={videoFormChanging}
+                handleVideoFormChange={handleVideoFormChange}
+                createVideo={createVideo}
+            />
             <View style={styles.photoBlockContainer}>
                 {currentPhotoObjects.length > 0 ?
                 <Carousel
@@ -125,9 +142,7 @@ export default function Transformation({navigation, deletePhotos, route}) {
                 </TouchableOpacity>
                 <TouchableOpacity 
                     style={styles.footerItem}
-                    onPress={() => navigation.navigate('Video', {
-                        photos: currentPhotoObjects.map(photo => photo.image)
-                    })}
+                    onPress={() => handleVideoFormChange()}
                 >
                     <Ionicons 
                         name='ios-videocam-outline' 
