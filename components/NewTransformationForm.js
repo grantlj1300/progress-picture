@@ -1,10 +1,12 @@
-import { View, TextInput, StyleSheet, Modal, Button } from 'react-native'
+import { View, TextInput, Text, StyleSheet, Modal, Button, TouchableOpacity } from 'react-native'
 import { useState } from 'react';
 
 export default function NewTransformationForm({ creatingNewTransformation, handleCreateTransformationChange, addNewTransformation }) {
 
     const [transformationTitle, setTransformationTitle] = useState('')
     const [daysBetweenPhotos, setDaysBetweenPhotos] = useState('')
+    const [trackWeight, setTrackWeight] = useState(false)
+    const [poundsOrKilos, setPoundsOrKilos] = useState(' lbs')
 
     function submitForm(){
         if(daysBetweenPhotos < 1){
@@ -42,6 +44,49 @@ export default function NewTransformationForm({ creatingNewTransformation, handl
                             placeholder="Days Between Photos"
                             onChangeText={(newDays) => setDaysBetweenPhotos(newDays)}
                         />
+                        <TouchableOpacity
+                            onPress={() => setTrackWeight(prevStatus => !prevStatus)}
+                            style={{flexDirection: 'row', alignItems: 'center'}}
+                        >
+                            <View style={styles.radioBox}>
+                                {
+                                trackWeight ?
+                                    <View style={styles.selectedRadioBox}/>
+                                    : null
+                                }
+                            </View>
+                            <Text style={{paddingLeft: 5}}>Track Weight</Text>
+                        </TouchableOpacity>
+                        {trackWeight &&
+                        <View style={{flexDirection: 'row'}}>
+                            <TouchableOpacity
+                                onPress={() => setPoundsOrKilos(' lbs')}
+                                style={{flexDirection: 'row', alignItems: 'center'}}
+                            >
+                                <View style={styles.radioBox}>
+                                    {
+                                    poundsOrKilos === ' lbs' ?
+                                    <View style={styles.selectedRadioBox}/>
+                                        : null
+                                    }
+                                </View>
+                                <Text style={{paddingLeft: 5}}>Pounds (lbs)</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => setPoundsOrKilos(' kg')}
+                                style={{flexDirection: 'row', alignItems: 'center'}}
+                            >
+                                <View style={styles.radioBox}>
+                                    {
+                                    poundsOrKilos === ' kg' ?
+                                    <View style={styles.selectedRadioBox}/>
+                                        : null
+                                    }
+                                </View>
+                                <Text style={{paddingLeft: 5}}>Kilograms (kg)</Text>
+                            </TouchableOpacity>
+                        </View>
+                        }
                     </View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
                         <Button
@@ -65,5 +110,20 @@ const styles = StyleSheet.create({
         margin: 12,
         borderWidth: 1,
         padding: 10
+    },
+    radioBox: {
+        height: 20,
+        width: 20,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: 'blue',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    selectedRadioBox: {
+        height: 10,
+        width: 10,
+        borderRadius: 6,
+        backgroundColor: 'blue'
     }
   });
