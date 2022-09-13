@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
-import { StyleSheet, Text, View, ImageBackground, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ImageBackground, TouchableOpacity } from 'react-native';
 import { Camera } from 'expo-camera';
 import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 import Slider from '@react-native-community/slider';
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Feather from '@expo/vector-icons/Feather'
 
-export default function CameraScreen({route, addNewPhoto, navigation}) {
+export default function CameraScreen({route, navigation}) {
 
-    const {name, lastPhoto, addToCurrentPhotos} = route.params
+    const {lastPhoto, addNewPhoto} = route.params
     const [hasCameraPermission, setHasCameraPermission] = useState(null)
     const [camera, setCamera] = useState(null)
     const [image, setImage] = useState(null)
@@ -202,15 +202,13 @@ export default function CameraScreen({route, addNewPhoto, navigation}) {
                             }}
                         />
                         <Ionicons 
-                        name='checkmark-circle-outline'
-                        size={32}
-                        color={'white'}
-                        onPress={() => {
-                            addNewPhoto(image, name)
-                            addToCurrentPhotos(image)
-                            setImage(null)
-                            navigation.goBack()
-                        }}
+                            name='checkmark-circle-outline'
+                            size={32}
+                            color={'white'}
+                            onPress={() => {
+                                addNewPhoto(image)
+                                navigation.goBack()
+                            }}
                         />
                     </View>
                     {settingBackgroundOpacity && 

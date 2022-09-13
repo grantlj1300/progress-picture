@@ -1,12 +1,19 @@
 import { View, TextInput, Text, StyleSheet, Modal, Button, TouchableOpacity } from 'react-native'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function NewTransformationForm({ creatingNewTransformation, handleCreateTransformationChange, addNewTransformation }) {
+export default function TransformationForm({ itemToEdit, displayTransformationForm, handleDisplayTransformationForm, addNewTransformation, editTransformation }) {
 
     const [transformationTitle, setTransformationTitle] = useState('')
     const [daysBetweenPhotos, setDaysBetweenPhotos] = useState('')
     const [trackWeight, setTrackWeight] = useState(false)
-    const [poundsOrKilos, setPoundsOrKilos] = useState(' lbs')
+    const [poundsOrKilos, setPoundsOrKilos] = useState('lbs')
+    
+    useEffect(() => {
+        setTransformationTitle(itemToEdit ? itemToEdit.name : '')
+        setDaysBetweenPhotos(itemToEdit ? itemToEdit.daysBetweenPhotos : '')
+        setTrackWeight(itemToEdit?.weight ? true : false)
+        setPoundsOrKilos(itemToEdit ? itemToEdit.weight : 'lbs')
+    }, [itemToEdit])
 
     function submitForm(){
         if(daysBetweenPhotos < 1){
@@ -14,8 +21,10 @@ export default function NewTransformationForm({ creatingNewTransformation, handl
             return
         }
         if(transformationTitle){
-            addNewTransformation(transformationTitle, daysBetweenPhotos)
-            handleCreateTransformationChange()
+            const weight = trackWeight ? poundsOrKilos : ''
+            itemToEdit ? editTransformation(itemToEdit.id, transformationTitle, daysBetweenPhotos, weight)
+            : addNewTransformation(transformationTitle, daysBetweenPhotos, weight)
+            handleDisplayTransformationForm()
         }
         else{
             alert("Enter a title!")
@@ -25,19 +34,21 @@ export default function NewTransformationForm({ creatingNewTransformation, handl
     return (
         <Modal
             animationType='fade'
-            visible={creatingNewTransformation}
+            visible={displayTransformationForm}
             transparent={true}
-            onRequestClose={() => handleCreateTransformationChange()}
+            onRequestClose={() => handleDisplayTransformationForm()}
         >
             <View style={{backgroundColor: '#00000080', flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
                 <View style={{backgroundColor: '#fff', padding: 20, width: 300, height: 300, justifyContent: 'space-between'}}>
                     <View>
                         <TextInput
+                            value={transformationTitle}
                             style={styles.inputContainer}
                             placeholder="Title of Transformation"
                             onChangeText={(newTitle) => setTransformationTitle(newTitle)}
                         />
                         <TextInput
+                            value={daysBetweenPhotos}
                             style={styles.inputContainer}
                             keyboardType='number-pad'
                             contextMenuHidden={true}
@@ -46,7 +57,7 @@ export default function NewTransformationForm({ creatingNewTransformation, handl
                         />
                         <TouchableOpacity
                             onPress={() => setTrackWeight(prevStatus => !prevStatus)}
-                            style={{flexDirection: 'row', alignItems: 'center'}}
+                            style={{flexDirection: 'row', alignItems: 'center', padding: 10}}
                         >
                             <View style={styles.radioBox}>
                                 {
@@ -60,12 +71,12 @@ export default function NewTransformationForm({ creatingNewTransformation, handl
                         {trackWeight &&
                         <View style={{flexDirection: 'row'}}>
                             <TouchableOpacity
-                                onPress={() => setPoundsOrKilos(' lbs')}
-                                style={{flexDirection: 'row', alignItems: 'center'}}
+                                onPress={() => setPoundsOrKilos('lbs')}
+                                style={{flexDirection: 'row', alignItems: 'center', padding: 10}}
                             >
                                 <View style={styles.radioBox}>
                                     {
-                                    poundsOrKilos === ' lbs' ?
+                                    poundsOrKilos === 'lbs' ?
                                     <View style={styles.selectedRadioBox}/>
                                         : null
                                     }
@@ -73,12 +84,12 @@ export default function NewTransformationForm({ creatingNewTransformation, handl
                                 <Text style={{paddingLeft: 5}}>Pounds (lbs)</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                onPress={() => setPoundsOrKilos(' kg')}
+                                onPress={() => setPoundsOrKilos('kg')}
                                 style={{flexDirection: 'row', alignItems: 'center'}}
                             >
                                 <View style={styles.radioBox}>
                                     {
-                                    poundsOrKilos === ' kg' ?
+                                    poundsOrKilos === 'kg' ?
                                     <View style={styles.selectedRadioBox}/>
                                         : null
                                     }
@@ -91,7 +102,7 @@ export default function NewTransformationForm({ creatingNewTransformation, handl
                     <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
                         <Button
                             title='Cancel'
-                            onPress={() => handleCreateTransformationChange()}
+                            onPress={() => handleDisplayTransformationForm()}
                         />
                         <Button
                             title='Submit'

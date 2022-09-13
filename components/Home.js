@@ -1,28 +1,62 @@
 import { 
     Text,
-    TextInput, 
     View, 
     Image, 
     ImageBackground, 
     StyleSheet, 
     TouchableOpacity,
-    Alert,
-    SafeAreaView } from 'react-native'
-import NewTransformationModal from './NewTransformationForm'
-import Ionicons from '@expo/vector-icons/Ionicons'
+    Alert } from 'react-native'
+import NewTransformationModal from './TransformationForm'
 import Feather from '@expo/vector-icons/Feather'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import Carousel from 'react-native-snap-carousel'
+import uuid from 'react-native-uuid'
 import { useState } from 'react'
 
-export default function Home({navigation, transformations, deleteTransformation, expoPushToken, sendPushNotification, addNewTransformation}) {
+export default function Home({navigation, transformations, updateTransformations, expoPushToken, sendPushNotification}) {
 
     const [editing, setEditing] = useState(false)
-    const [creatingNewTransformation, setCreatingNewTransformation] = useState(false)
+    const [itemToEdit, setItemToEdit] = useState(null)
+    const [displayTransformationForm, setDisplayTransformationForm] = useState(false)
     const [currentIndex, setCurrentIndex] = useState(0)
 
-    const handleCreateTransformationChange = () => {
-        setCreatingNewTransformation(prevStatus => !prevStatus)
+    const addNewTransformation = (newName, newDays, newWeight) => {
+        const today = new Date()
+        const currDate = parseInt(today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear()
+        const newTransformations = [
+        {
+            id: uuid.v4(),
+            name: newName, 
+            daysBetweenPhotos: newDays,
+            startDate: currDate, 
+            weight: newWeight,
+            photoObjects: []
+        },
+        ...transformations]
+        updateTransformations(newTransformations)
+    }
+
+    const deleteTransformation = (transformationId) => {
+        const newTransformations = transformations.filter((transformation) => {
+            return transformation.id !== transformationId
+        })
+        updateTransformations(newTransformations)
+    }
+
+    const editTransformation = (transId, transName, transDays, transWeight) => {
+        const newTransformations = transformations.map(transformation => {
+            if(transformation.id === transId){
+                return {...transformation, name: transName, daysBetweenPhotos: transDays, weight: transWeight}
+            }
+            else{
+                return transformation
+            }
+        })
+        updateTransformations(newTransformations)
+    }
+
+    const handleDisplayTransformationForm = () => {
+        setDisplayTransformationForm(prevStatus => !prevStatus)
     }
 
     function generateCards(photos){
@@ -108,9 +142,11 @@ export default function Home({navigation, transformations, deleteTransformation,
             style={styles.homeContainer}
         >
             <NewTransformationModal 
-                creatingNewTransformation={creatingNewTransformation}
-                handleCreateTransformationChange={handleCreateTransformationChange}
+                itemToEdit={itemToEdit}
+                displayTransformationForm={displayTransformationForm}
+                handleDisplayTransformationForm={handleDisplayTransformationForm}
                 addNewTransformation={addNewTransformation}
+                editTransformation={editTransformation}
             />
             {transformations.length > 0 ? 
             <View style={styles.previewContainer}>
@@ -137,19 +173,29 @@ export default function Home({navigation, transformations, deleteTransformation,
                                         { text: "Cancel" },
                                         {
                                             text: "Delete", 
-                                            onPress: () => deleteTransformation(item.name)
+                                            onPress: () => deleteTransformation(item.id)
                                         }
                                         ]
                                     )
                                 }
                             />}
                             <TouchableOpacity 
-                                onPress={() => !editing && navigation.navigate('Transformation', {
-                                    name: item.name,
-                                    daysBetweenPhotos: item.daysBetweenPhotos,
-                                    startDate: item.startDate,
-                                    photoObjects: item.photoObjects
-                                })} 
+                                onPress={() => {
+                                    if(editing){
+                                        setItemToEdit(item)
+                                        handleDisplayTransformationForm()
+                                    }
+                                    else{
+                                        navigation.navigate('Transformation', {
+                                            id: item.id,
+                                            daysBetweenPhotos: item.daysBetweenPhotos,
+                                            startDate: item.startDate,
+                                            photoObjects: item.photoObjects,
+                                            trackingWeight: item.weight
+                                        })
+                                    }
+                                }
+                            } 
                                 style={{alignItems:'center'}}
                             >
                                 {generateCards(item.photoObjects.slice(0, 3))}
@@ -184,7 +230,11 @@ export default function Home({navigation, transformations, deleteTransformation,
                 <TouchableOpacity 
                     style={styles.footerItem}
                     activeOpacity={1}
-                    onPress={() => handleCreateTransformationChange()}
+                    onPress={() => {
+                        setEditing(false)
+                        setItemToEdit(null)
+                        handleDisplayTransformationForm()
+                    }}
                 >
                     <Feather 
                         name='plus-circle' 

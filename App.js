@@ -28,20 +28,10 @@ export default function App() {
     const responseListener = useRef()
 
     const [transformations, setTransformations] = useState([])
-    
+
     useEffect(() => {
         getTransformationData()
     }, [])
-
-    // useEffect(async() => {
-    //     try{
-    //         const dir = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory)
-    //         console.log(dir)
-    //     }
-    //     catch(e){
-    //         console.log(e)
-    //     }
-    // }, [])
 
     const getTransformationData = async() => {
         const { exists } = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'transformations.json')
@@ -66,6 +56,24 @@ export default function App() {
         catch(e){
             console.log(e)
         }
+    }
+
+    const updateTransformations = (newTransformations) => {
+        setTransformations(newTransformations)
+        storeTransformationData(newTransformations)
+    }
+
+    const updatePhotoObjects = (transformationId, newPhotos) => {
+        const newTransformations = transformations.map((transformation) => {
+            if(transformation.id === transformationId){
+                return {...transformation, photoObjects: newPhotos}
+            }
+            else{
+                return transformation
+            }
+        })
+        setTransformations(newTransformations)
+        storeTransformationData(newTransformations)
     }
 
     useEffect(() => {
@@ -131,59 +139,6 @@ export default function App() {
         });
     }
 
-    const addNewTransformation = (newName, newDays) => {
-        const today = new Date()
-        const currDate = parseInt(today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear()
-        const newTransformations = [
-        {
-            name: newName, 
-            daysBetweenPhotos: newDays,
-            startDate: currDate, 
-            photoObjects: []
-        },
-        ...transformations]
-        setTransformations(newTransformations)
-        storeTransformationData(newTransformations)
-    }
-
-    const deleteTransformation = async(transformationName) => {
-        const newTransformations = transformations.filter((transformation) => {
-            return transformation.name !== transformationName
-        })
-        setTransformations(newTransformations)
-        storeTransformationData(newTransformations)
-    }
-
-    const addNewPhoto = (newPic, transformationName) => {
-        const newTransformations = transformations.map((transformation) => {
-        if(transformation.name === transformationName){
-            const today = new Date()
-            const currDate = parseInt(today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear()
-            const newPhotos = [{image: newPic, date: currDate}, ...transformation.photoObjects]
-            return {...transformation, photoObjects: newPhotos}
-        }
-        else{
-            return transformation
-        }
-        })
-        setTransformations(newTransformations)
-        storeTransformationData(newTransformations)
-    }
-
-    const deletePhotos = (removePhotos, transformationName) => {
-        const newTransformations = transformations.map((transformation) => {
-        if(transformation.name === transformationName){
-            const newPhotos = transformation.photoObjects.filter(photo => photo.image !== removePhotos)
-            return {...transformation, photoObjects: newPhotos}
-        }
-        else{
-            return transformation
-        }
-        })
-        setTransformations(newTransformations)
-        storeTransformationData(newTransformations)
-    }
-
     return (
         <NavigationContainer>
         <StatusBar
@@ -199,10 +154,9 @@ export default function App() {
             {(props) => 
             <HomeScreen 
                 transformations={transformations} 
-                deleteTransformation={deleteTransformation} 
+                updateTransformations={updateTransformations} 
                 sendPushNotification={sendPushNotification}
                 expoPushToken={expoPushToken}
-                addNewTransformation={addNewTransformation}
                 {...props}
             />}
             </Stack.Screen>
@@ -210,13 +164,17 @@ export default function App() {
             <Stack.Screen
             name='Transformation'
             >
-            {(props) => <TransformationScreen deletePhotos={deletePhotos} {...props}/>}
+            {(props) => 
+            <TransformationScreen 
+                updatePhotoObjects={updatePhotoObjects}
+                {...props}
+            />}
             </Stack.Screen>
 
             <Stack.Screen
             name='Camera'
             >
-            {(props) => <CameraScreen addNewPhoto={addNewPhoto} {...props}/>}
+            {(props) => <CameraScreen {...props}/>}
             </Stack.Screen>
 
             <Stack.Screen

@@ -1,6 +1,5 @@
 import { 
     View, 
-    Button, 
     Image, 
     StyleSheet, 
     Text, 
@@ -12,16 +11,22 @@ import { useState } from 'react'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Feather from '@expo/vector-icons/Feather'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import WeightForm from './WeightForm'
 
-export default function Transformation({navigation, deletePhotos, route}) {
+export default function Transformation({navigation, updatePhotoObjects, route}) {
 
-    const {name, photoObjects} = route.params
+    const {id, trackingWeight, photoObjects} = route.params
     const [currentPhotoObjects, setCurrentPhotoObjects] = useState(photoObjects)
     const [videoFormChanging, setVideoFormChanging] = useState(false)
+    const [weightFormChanging, setWeightFormChanging] = useState(false)
     const [editing, setEditing] = useState(false)
 
     const handleVideoFormChange = () => {
         setVideoFormChanging(prevStatus => !prevStatus)
+    }
+
+    const handleWeightFormChange = () => {
+        setWeightFormChanging(prevStatus => !prevStatus)
     }
 
     const createVideo = (secondsPerPhoto) => {
@@ -31,10 +36,33 @@ export default function Transformation({navigation, deletePhotos, route}) {
         })
     }
 
-    const addToCurrentPhotos = (newPic) => {
+    const addNewPhoto = (newPic) => {
         const today = new Date()
         const currDate = parseInt(today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear()
-        setCurrentPhotoObjects(prevPhotos => [{image: newPic, date: currDate}, ...prevPhotos])
+        setCurrentPhotoObjects(prevPhotos => [{image: newPic, date: currDate, weight: ''}, ...prevPhotos])
+        updatePhotoObjects(id, currentPhotoObjects)
+        if(trackingWeight){
+            setWeightFormChanging(true)
+        }
+    }
+
+    const deletePhoto = (photoToDelete) => {
+        const newPhotos = currentPhotoObjects.filter(photoObject => photoObject.image !== photoToDelete)
+        setCurrentPhotoObjects(newPhotos)
+        updatePhotoObjects(id, newPhotos)
+    }
+
+    const editPhotoWeight = (image, newWeight) => {
+        const newPhotos = currentPhotoObjects.map(photoObject => {
+            if(photoObject.image === image){
+                return {...photoObject, weight: newWeight}
+            }
+            else{
+                return photoObject
+            }
+        })
+        setCurrentPhotoObjects(newPhotos)
+        updatePhotoObjects(id, newPhotos)
     }
 
     return (
@@ -46,6 +74,13 @@ export default function Transformation({navigation, deletePhotos, route}) {
                 videoFormChanging={videoFormChanging}
                 handleVideoFormChange={handleVideoFormChange}
                 createVideo={createVideo}
+            />
+            <WeightForm 
+                weightFormChanging={weightFormChanging}
+                handleWeightFormChange={handleWeightFormChange}
+                weightLabel={trackingWeight}
+                editPhotoWeight={editPhotoWeight}
+                image={currentPhotoObjects.at(0)?.image}
             />
             <View style={styles.photoBlockContainer}>
                 {currentPhotoObjects.length > 0 ?
@@ -65,17 +100,14 @@ export default function Transformation({navigation, deletePhotos, route}) {
                                     name='x-circle' 
                                     size={24} 
                                     color={'red'}
-                                    onPress={() => {
-                                        setCurrentPhotoObjects((prevPhotos) => 
-                                            prevPhotos.filter((photo) => photo.image !== item.image))
-                                        deletePhotos(item.image, name)
-                                    }}
+                                    onPress={() => deletePhoto(item.image)}
                                 />}
                                 <View style={{alignItems: 'center'}}>
                                     <Image source={{uri: item.image}} 
                                     style={{width:250, height:500, borderRadius: 20}}
                                     />
                                     <Text>{item.date}</Text>
+                                    {item.weight && <Text>{item.weight}</Text>}
                                 </View>
                             </View>
                         )
@@ -129,9 +161,8 @@ export default function Transformation({navigation, deletePhotos, route}) {
                 <TouchableOpacity 
                     style={styles.footerItem}
                     onPress={() => navigation.navigate('Camera', {
-                        name: name,
                         lastPhoto: currentPhotoObjects.at(0)?.image,
-                        addToCurrentPhotos: addToCurrentPhotos
+                        addNewPhoto: addNewPhoto
                     })}
                 >
                     <Feather 
