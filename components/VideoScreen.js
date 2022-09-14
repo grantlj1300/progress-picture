@@ -5,18 +5,18 @@ import { useState, useEffect } from 'react'
 export default function VideoScreen({route, navigation}) {
 
     const { photos, millisecondsPerPhoto } = route.params
-    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
+    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(photos.length - 1)
     const [playingVideo, setPlayingVideo] = useState(false)
 
     useEffect(() => {
         let intervalId
         if(playingVideo){
             intervalId = setInterval(() => {
-                if(photos[currentPhotoIndex + 1]){
-                    setCurrentPhotoIndex(prev => prev + 1)
+                if(photos[currentPhotoIndex - 1]){
+                    setCurrentPhotoIndex(prev => prev - 1)
                 }
                 else{
-                    setCurrentPhotoIndex(0)
+                    setCurrentPhotoIndex(photos.length - 1)
                     setPlayingVideo(false)
                 }
             }, millisecondsPerPhoto);

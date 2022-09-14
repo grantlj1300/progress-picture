@@ -118,7 +118,7 @@ export default function Home({navigation, transformations, updateTransformations
                     <View 
                         style={[styles.imageStackContainer, 
                             { justifyContent: 'center', alignItems: 'center', 
-                            borderWidth: 1, borderRadius: 20,
+                            borderWidth: 1, borderRadius: 20, borderColor: 'white',
                             width: 200, 
                             height: 400, 
                             marginHorizontal: 25,
@@ -128,7 +128,7 @@ export default function Home({navigation, transformations, updateTransformations
                         <MaterialIcons 
                             name='photo-album' 
                             size={200} 
-                            color={'black'}
+                            color={'white'}
                         />
                         
                     </View>
@@ -160,7 +160,7 @@ export default function Home({navigation, transformations, updateTransformations
                     renderItem={({item, index}) => {
                     return  (
                         <View>
-                            {editing && 
+                            {editing ? 
                             <Feather 
                                 name='x-circle' 
                                 size={24} 
@@ -178,7 +178,10 @@ export default function Home({navigation, transformations, updateTransformations
                                         ]
                                     )
                                 }
-                            />}
+                            />
+                            :
+                            <View style={{height: 24.2}}/>
+                            }
                             <TouchableOpacity 
                                 onPress={() => {
                                     if(editing){
@@ -199,8 +202,13 @@ export default function Home({navigation, transformations, updateTransformations
                                 style={{alignItems:'center'}}
                             >
                                 {generateCards(item.photoObjects.slice(0, 3))}
-                                <Text style={{fontWeight: 'bold', marginBottom: 10}}>{item.name}</Text>
-                                <Text>Created: {item.startDate}</Text>
+                                {currentIndex === index &&
+                                <View style={{height: 100, width: '90%'}}>
+                                    <View style={styles.previewTextBox}>
+                                        <Text style={{fontWeight: 'bold', marginBottom: 10}}>{item.name}</Text>
+                                        <Text>Created: {item.startDate}</Text>
+                                    </View>
+                                </View>}
                             </TouchableOpacity>
                         </View>
                     )}}
@@ -210,7 +218,7 @@ export default function Home({navigation, transformations, updateTransformations
             <View style={styles.previewContainer}>
                 <View style={{alignItems: 'center'}}>
                     {generateCards([])}
-                    <Text style={{fontWeight: 'bold'}}>No Collections</Text>
+                    <Text style={{fontWeight: 'bold', color: 'white'}}>No Collections</Text>
                 </View>
             </View>
             }
@@ -251,18 +259,26 @@ export default function Home({navigation, transformations, updateTransformations
 const styles = StyleSheet.create({
     homeContainer: {
         flex: 1,
-        backgroundColor: '#7d7d7d',
+        backgroundColor: 'black',
         alignItems: 'center',
     },
     previewContainer: {
         flex: 9,
         flexDirection: 'row',
-        justifyContent: 'center', 
-        alignItems:'center',
-        //borderWidth:1
+        alignItems:'center'
     },
     previewItem: {
-        //borderWidth:1
+        borderWidth:1,
+        borderColor: 'white'
+    },
+    previewTextBox: {
+        backgroundColor: 'white',
+        padding: 10,
+        borderRadius: 10,
+        shadowOpacity: 0.8, 
+        shadowRadius: 2, 
+        shadowOffset:{width:1}, 
+        shadowColor: 'white'
     },
     imageStackContainer: {
         width: 250, 

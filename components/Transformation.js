@@ -32,15 +32,16 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
     const createVideo = (secondsPerPhoto) => {
         navigation.navigate('Video', {
             photos: currentPhotoObjects.map(photo => photo.image),
-            milliSecondsPerPhoto: secondsPerPhoto * 1000
+            millisecondsPerPhoto: secondsPerPhoto * 1000
         })
     }
 
     const addNewPhoto = (newPic) => {
         const today = new Date()
         const currDate = parseInt(today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear()
-        setCurrentPhotoObjects(prevPhotos => [{image: newPic, date: currDate, weight: ''}, ...prevPhotos])
-        updatePhotoObjects(id, currentPhotoObjects)
+        const newPhotoObjects = [{image: newPic, date: currDate, weight: ''}, ...currentPhotoObjects]
+        setCurrentPhotoObjects(newPhotoObjects)
+        updatePhotoObjects(id, newPhotoObjects)
         if(trackingWeight){
             setWeightFormChanging(true)
         }
@@ -104,10 +105,12 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                                 />}
                                 <View style={{alignItems: 'center'}}>
                                     <Image source={{uri: item.image}} 
-                                    style={{width:250, height:500, borderRadius: 20}}
+                                    style={{width:250, height:500, borderRadius: 20, marginBottom: 30}}
                                     />
-                                    <Text>{item.date}</Text>
-                                    {item.weight && <Text>{item.weight}</Text>}
+                                    <View style={styles.previewTextBox}>
+                                        <Text>{item.date}</Text>
+                                        {item.weight && <Text>{item.weight}</Text>}
+                                    </View>
                                 </View>
                             </View>
                         )
@@ -118,7 +121,7 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                     <View 
                         style={ 
                             { justifyContent: 'center', 
-                            borderWidth: 1, borderRadius: 20,
+                            borderWidth: 1, borderRadius: 20, borderColor: 'white',
                             width: 250, 
                             height: 500, 
                             marginHorizontal: 25,
@@ -128,11 +131,11 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                         <MaterialIcons 
                             name='insert-photo' 
                             size={250} 
-                            color={'black'}
+                            color={'white'}
                         />
                         
                     </View>
-                    <Text>No Photos</Text>
+                    <Text style={{color: 'white'}}>No Photos</Text>
                 </View>
                 }
             </View>
@@ -189,7 +192,7 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
 const styles = StyleSheet.create({
     transformationContainer: {
         flex: 1,
-        backgroundColor: '#7d7d7d',
+        backgroundColor: 'black',
         alignItems: 'center',
     },
     photoBlockContainer: {
@@ -197,6 +200,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center', 
         alignItems:'center',
+    },
+    previewTextBox: {
+        backgroundColor: 'white',
+        padding: 10,
+        borderRadius: 10,
+        shadowOpacity: 0.8, 
+        shadowRadius: 2, 
+        shadowOffset:{width:1}, 
+        shadowColor: 'white'
     },
     footerContainer: {
         flex: 1,

@@ -12,8 +12,8 @@ export default function TransformationForm({ itemToEdit, displayTransformationFo
         setTransformationTitle(itemToEdit ? itemToEdit.name : '')
         setDaysBetweenPhotos(itemToEdit ? itemToEdit.daysBetweenPhotos : '')
         setTrackWeight(itemToEdit?.weight ? true : false)
-        setPoundsOrKilos(itemToEdit ? itemToEdit.weight : 'lbs')
-    }, [itemToEdit])
+        setPoundsOrKilos(itemToEdit?.weight ? itemToEdit.weight : 'lbs')
+    }, [displayTransformationForm])
 
     function submitForm(){
         if(daysBetweenPhotos < 1){
@@ -23,7 +23,7 @@ export default function TransformationForm({ itemToEdit, displayTransformationFo
         if(transformationTitle){
             const weight = trackWeight ? poundsOrKilos : ''
             itemToEdit ? editTransformation(itemToEdit.id, transformationTitle, daysBetweenPhotos, weight)
-            : addNewTransformation(transformationTitle, daysBetweenPhotos, weight)
+                : addNewTransformation(transformationTitle, daysBetweenPhotos, weight)
             handleDisplayTransformationForm()
         }
         else{
@@ -38,8 +38,8 @@ export default function TransformationForm({ itemToEdit, displayTransformationFo
             transparent={true}
             onRequestClose={() => handleDisplayTransformationForm()}
         >
-            <View style={{backgroundColor: '#00000080', flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                <View style={{backgroundColor: '#fff', padding: 20, width: 300, height: 300, justifyContent: 'space-between'}}>
+            <View style={styles.screenContainer}>
+                <View style={styles.formContainer}>
                     <View>
                         <TextInput
                             value={transformationTitle}
@@ -116,6 +116,20 @@ export default function TransformationForm({ itemToEdit, displayTransformationFo
 }
 
 const styles = StyleSheet.create({
+    screenContainer: {
+        flex: 1, 
+        flexDirection: 'column', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        backgroundColor: '#00000080'
+    },
+    formContainer: {
+        padding: 20, 
+        width: 300, 
+        minHeight: 0,
+        justifyContent: 'space-between',
+        backgroundColor: '#fff', 
+    },
     inputContainer: {
         height: 40,
         margin: 12,
