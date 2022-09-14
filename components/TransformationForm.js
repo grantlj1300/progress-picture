@@ -43,6 +43,7 @@ export default function TransformationForm({ itemToEdit, displayTransformationFo
                     <View>
                         <TextInput
                             value={transformationTitle}
+                            maxLength={20}
                             style={styles.inputContainer}
                             placeholder="Title of Transformation"
                             onChangeText={(newTitle) => setTransformationTitle(newTitle)}

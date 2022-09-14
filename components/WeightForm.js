@@ -22,8 +22,8 @@ export default function WeightForm({ weightFormChanging, handleWeightFormChange,
             transparent={true}
             onRequestClose={() => handleWeightFormChange()}
         >
-            <View style={{backgroundColor: '#00000080', flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                <View style={{backgroundColor: '#fff', padding: 20, width: 300, height: 300, justifyContent: 'space-between'}}>
+            <View style={styles.screenContainer}>
+                <View style={styles.formContainer}>
                     <View>
                         <TextInput
                             style={styles.inputContainer}
@@ -50,6 +50,20 @@ export default function WeightForm({ weightFormChanging, handleWeightFormChange,
 }
 
 const styles = StyleSheet.create({
+    screenContainer: {
+        flex: 1, 
+        flexDirection: 'column', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        backgroundColor: '#00000080'
+    },
+    formContainer: {
+        padding: 20, 
+        width: 300, 
+        minHeight: 0,
+        justifyContent: 'space-between',
+        backgroundColor: '#fff', 
+    },
     inputContainer: {
         height: 40,
         margin: 12,

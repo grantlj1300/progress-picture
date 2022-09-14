@@ -29,10 +29,11 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
         setWeightFormChanging(prevStatus => !prevStatus)
     }
 
-    const createVideo = (secondsPerPhoto) => {
+    const createVideo = (secondsPerPhoto, previewOrRecord) => {
         navigation.navigate('Video', {
             photos: currentPhotoObjects.map(photo => photo.image),
-            millisecondsPerPhoto: secondsPerPhoto * 1000
+            millisecondsPerPhoto: secondsPerPhoto * 1000,
+            previewOrRecord: previewOrRecord
         })
     }
 
@@ -96,21 +97,22 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                     renderItem={({item}) => {
                         return (
                             <View>
-                                {editing && 
+                                {editing ? 
                                 <Feather 
                                     name='x-circle' 
                                     size={24} 
                                     color={'red'}
                                     onPress={() => deletePhoto(item.image)}
-                                />}
+                                />
+                                :
+                                <View style={{height: 24.2}}/>
+                                }
                                 <View style={{alignItems: 'center'}}>
                                     <Image source={{uri: item.image}} 
                                     style={{width:250, height:500, borderRadius: 20, marginBottom: 30}}
                                     />
-                                    <View style={styles.previewTextBox}>
-                                        <Text>{item.date}</Text>
-                                        {item.weight && <Text>{item.weight}</Text>}
-                                    </View>
+                                    <Text style={{color: 'white', fontSize: 14, fontWeight: '200'}}>{item.date}</Text>
+                                    {item.weight && <Text style={{color: 'white', fontSize: 14, fontWeight: '200', paddingTop: 10}}>{item.weight}</Text>}
                                 </View>
                             </View>
                         )
@@ -135,7 +137,7 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                         />
                         
                     </View>
-                    <Text style={{color: 'white'}}>No Photos</Text>
+                    <Text style={{color: 'white', fontSize: 14, fontWeight: '200'}}>No Photos</Text>
                 </View>
                 }
             </View>

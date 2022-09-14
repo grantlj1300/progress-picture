@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 
 export default function VideoScreen({route, navigation}) {
 
-    const { photos, millisecondsPerPhoto } = route.params
+    const { photos, millisecondsPerPhoto, previewOrRecord } = route.params
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(photos.length - 1)
     const [playingVideo, setPlayingVideo] = useState(false)
 
@@ -28,7 +28,7 @@ export default function VideoScreen({route, navigation}) {
     }, [playingVideo, currentPhotoIndex])
 
     return (
-        <View style={{}}>
+        <View style={[previewOrRecord === 'record' ? {padding: 40} : {}, { backgroundColor:'black' }]}>
             <StatusBar hidden/>
             <ImageBackground source={{uri: photos[currentPhotoIndex]}} style={{width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center'}}>
                 {!playingVideo &&

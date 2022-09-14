@@ -201,14 +201,9 @@ export default function Home({navigation, transformations, updateTransformations
                             } 
                                 style={{alignItems:'center'}}
                             >
+                                <Text style={{fontWeight: 'bold', color: 'white', fontSize: 24}}>{item.name}</Text>
                                 {generateCards(item.photoObjects.slice(0, 3))}
-                                {currentIndex === index &&
-                                <View style={{height: 100, width: '90%'}}>
-                                    <View style={styles.previewTextBox}>
-                                        <Text style={{fontWeight: 'bold', marginBottom: 10}}>{item.name}</Text>
-                                        <Text>Created: {item.startDate}</Text>
-                                    </View>
-                                </View>}
+                                <Text style={{color: 'white', fontSize: 14, fontWeight: '200'}}>Created: {item.startDate}</Text>
                             </TouchableOpacity>
                         </View>
                     )}}
@@ -217,8 +212,8 @@ export default function Home({navigation, transformations, updateTransformations
             :
             <View style={styles.previewContainer}>
                 <View style={{alignItems: 'center'}}>
+                    <Text style={{fontWeight: 'bold', color: 'white', fontSize: 24}}>No Collections</Text>
                     {generateCards([])}
-                    <Text style={{fontWeight: 'bold', color: 'white'}}>No Collections</Text>
                 </View>
             </View>
             }
@@ -271,15 +266,6 @@ const styles = StyleSheet.create({
         borderWidth:1,
         borderColor: 'white'
     },
-    previewTextBox: {
-        backgroundColor: 'white',
-        padding: 10,
-        borderRadius: 10,
-        shadowOpacity: 0.8, 
-        shadowRadius: 2, 
-        shadowOffset:{width:1}, 
-        shadowColor: 'white'
-    },
     imageStackContainer: {
         width: 250, 
         height: 500, 
@@ -291,6 +277,15 @@ const styles = StyleSheet.create({
     imageSizing: {
         width: 200, 
         height: 400
+    },
+    previewTextBox: {
+        backgroundColor: 'white',
+        padding: 10,
+        borderRadius: 10,
+        shadowOpacity: 0.8, 
+        shadowRadius: 2, 
+        shadowOffset:{width:1}, 
+        shadowColor: 'white'
     },
     footerContainer: {
         flex: 1,
