@@ -4,26 +4,20 @@ import { useState, useEffect } from 'react';
 export default function TransformationForm({ itemToEdit, displayTransformationForm, handleDisplayTransformationForm, addNewTransformation, editTransformation }) {
 
     const [transformationTitle, setTransformationTitle] = useState('')
-    const [daysBetweenPhotos, setDaysBetweenPhotos] = useState('')
     const [trackWeight, setTrackWeight] = useState(false)
     const [poundsOrKilos, setPoundsOrKilos] = useState('lbs')
     
     useEffect(() => {
         setTransformationTitle(itemToEdit ? itemToEdit.name : '')
-        setDaysBetweenPhotos(itemToEdit ? itemToEdit.daysBetweenPhotos : '')
         setTrackWeight(itemToEdit?.weight ? true : false)
         setPoundsOrKilos(itemToEdit?.weight ? itemToEdit.weight : 'lbs')
     }, [displayTransformationForm])
 
     function submitForm(){
-        if(daysBetweenPhotos < 1){
-            alert("Days between photos must be greater than 0!")
-            return
-        }
         if(transformationTitle){
             const weight = trackWeight ? poundsOrKilos : ''
-            itemToEdit ? editTransformation(itemToEdit.id, transformationTitle, daysBetweenPhotos, weight)
-                : addNewTransformation(transformationTitle, daysBetweenPhotos, weight)
+            itemToEdit ? editTransformation(itemToEdit.id, transformationTitle, weight)
+                : addNewTransformation(transformationTitle, weight)
             handleDisplayTransformationForm()
         }
         else{
@@ -47,14 +41,6 @@ export default function TransformationForm({ itemToEdit, displayTransformationFo
                             style={styles.inputContainer}
                             placeholder="Title of Transformation"
                             onChangeText={(newTitle) => setTransformationTitle(newTitle)}
-                        />
-                        <TextInput
-                            value={daysBetweenPhotos}
-                            style={styles.inputContainer}
-                            keyboardType='number-pad'
-                            contextMenuHidden={true}
-                            placeholder="Days Between Photos"
-                            onChangeText={(newDays) => setDaysBetweenPhotos(newDays)}
                         />
                         <TouchableOpacity
                             onPress={() => setTrackWeight(prevStatus => !prevStatus)}

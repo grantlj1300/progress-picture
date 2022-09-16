@@ -7,12 +7,13 @@ export default function VideoForm({ videoFormChanging, handleVideoFormChange, cr
     const [previewOrRecord, setPreviewOrRecord] = useState('preview')
 
     function submitForm(){
-        if(secondsPerPhoto <= 0){
+        const millisecondsPerPhoto = secondsPerPhoto * 1000
+        if(millisecondsPerPhoto <= 0 || isNaN(millisecondsPerPhoto)){
             alert("Seconds Per Photo must be greater than 0!")
             return
         }
         handleVideoFormChange()
-        createVideo(secondsPerPhoto, previewOrRecord)
+        createVideo(millisecondsPerPhoto, previewOrRecord)
     }
 
     return (

@@ -38,6 +38,12 @@ export default function CameraScreen({route, navigation}) {
         }
         return () => clearInterval(intervalId)
     }, [takingPicture, timerDisplay])
+
+    useEffect(() => {
+        if(backgroundOpacity === 0){
+            setSettingBackgroundOpacity(false)
+        }
+    }, [backgroundOpacity])
       
     useEffect(() => {
         (async() => {
@@ -82,15 +88,20 @@ export default function CameraScreen({route, navigation}) {
                     >
                         <View style={styles.cameraHeader}>
                             <View style={timerExpanded && styles.timerOpen}>
-                                <Ionicons
-                                    name={timerValue === 0 || timerExpanded ? 'timer-outline' : 'timer'}
-                                    size={32}
-                                    color={timerExpanded ? 'black' : 'white'}
+                                <TouchableOpacity
+                                    activeOpacity={1}
                                     onPress={() => setTimerExpanded(prevStatus => !prevStatus)}
-                                />
+                                >
+                                    <Ionicons
+                                        name={timerValue === 0 || timerExpanded ? 'timer-outline' : 'timer'}
+                                        size={32}
+                                        color={timerExpanded ? 'black' : 'white'}
+                                    />
+                                </TouchableOpacity>
                                 {timerExpanded && 
                                 <View style={{height: 103, justifyContent: 'space-between', alignItems: 'center', paddingTop: 6}}>
                                     <TouchableOpacity
+                                        activeOpacity={1}
                                         onPress={() => {
                                             setTimerValue(0)
                                             setTimerExpanded(false)
@@ -99,6 +110,7 @@ export default function CameraScreen({route, navigation}) {
                                         <Text style={[timerValue === 0 && {fontWeight: 'bold'}, {fontSize: 17}]}>0s</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
+                                        activeOpacity={1}
                                         onPress={() => {
                                             setTimerValue(3)
                                             setTimerExpanded(false)
@@ -107,6 +119,7 @@ export default function CameraScreen({route, navigation}) {
                                         <Text style={[timerValue === 3 && {fontWeight: 'bold'}, {fontSize: 17}]}>3s</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
+                                        activeOpacity={1}
                                         onPress={() => {
                                             setTimerValue(10)
                                             setTimerExpanded(false)
@@ -116,26 +129,34 @@ export default function CameraScreen({route, navigation}) {
                                     </TouchableOpacity>
                                 </View>}
                             </View>
-                            <Ionicons
-                                name={backgroundOpacity === 0 ? 'eye-off-outline' : 'eye-outline'}
-                                size={32}
-                                color={'white'}
+                            <TouchableOpacity
+                                activeOpacity={1}
                                 onPress={() => {
                                     if(backgroundOpacity === 0){
                                         setBackgroundOpacity(0.3)
                                     }
                                     setSettingBackgroundOpacity(prevStatus => !prevStatus)
                                 }}
-                            />
-                            <Ionicons 
-                                name='camera-reverse-outline' 
-                                size={32} 
-                                color={'white'}
+                            >
+                                <Ionicons
+                                    name={backgroundOpacity === 0 ? 'eye-off-outline' : 'eye-outline'}
+                                    size={32}
+                                    color={'white'}
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                activeOpacity={1}
                                 onPress={() => {
-                                setType(type === Camera.Constants.Type.back 
-                                ? Camera.Constants.Type.front : Camera.Constants.Type.back)
+                                    setType(type === Camera.Constants.Type.back 
+                                    ? Camera.Constants.Type.front : Camera.Constants.Type.back)
                                 }}
-                            />
+                            >
+                                <Ionicons 
+                                    name='camera-reverse-outline' 
+                                    size={32} 
+                                    color={'white'}
+                                />
+                            </TouchableOpacity>
                         </View>
 
                         {settingBackgroundOpacity && 
@@ -149,21 +170,28 @@ export default function CameraScreen({route, navigation}) {
                         {takingPicture ? 
                         <Text style={{color: 'white', fontSize: 72, alignSelf: 'center', paddingBottom: 30}}>{timerDisplay}</Text> 
                         :
-                        <Feather 
-                        name='circle' 
-                        size={72} 
-                        style={{alignSelf: 'center', paddingBottom: 30}}
-                        color={'white'}
-                        onPress={() => {
-                            if(timerValue){
-                                setTakingPicture(true)
-                                setTimerDisplay(timerValue)
-                            }
-                            else{
-                                takePicture()
-                            }
-                        }}
-                        />}
+                        <TouchableOpacity
+                            activeOpacity={1}
+                            onPress={() => {
+                                setSettingBackgroundOpacity(false)
+                                setTimerExpanded(false)
+                                if(timerValue){
+                                    setTakingPicture(true)
+                                    setTimerDisplay(timerValue)
+                                }
+                                else{
+                                    takePicture()
+                                }
+                            }}
+                        >
+                            <Feather 
+                                name='circle' 
+                                size={72} 
+                                style={{alignSelf: 'center', paddingBottom: 30}}
+                                color={'white'}
+                            />
+                        </TouchableOpacity>
+                        }
                     </ImageBackground>
                 </Camera>
             </View>
@@ -179,37 +207,49 @@ export default function CameraScreen({route, navigation}) {
                         imageStyle={{ opacity: backgroundOpacity }}
                         style={{width: '100%', height: '100%'}}
                     >
-                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingTop: 50, paddingHorizontal: 10}}>
-                        <Feather 
-                        name='x' 
-                        size={32} 
-                        color={'white'}
-                        onPress={() => {
-                            setBackgroundOpacity(0)
-                            setSettingBackgroundOpacity(false)
-                            setImage(null)
-                        }}
-                        />
-                        <Ionicons
-                            name={backgroundOpacity === 0 ? 'eye-off-outline' : 'eye-outline'}
-                            size={32}
-                            color={'white'}
+                    <View style={styles.cameraHeader}>
+                        <TouchableOpacity
+                            activeOpacity={1}
+                            onPress={() => {
+                                setBackgroundOpacity(0)
+                                setSettingBackgroundOpacity(false)
+                                setImage(null)
+                            }}
+                        >
+                            <Feather 
+                                name='x' 
+                                size={32} 
+                                color={'white'}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            activeOpacity={1}
                             onPress={() => {
                                 if(backgroundOpacity === 0){
                                     setBackgroundOpacity(0.3)
                                 }
                                 setSettingBackgroundOpacity(prevStatus => !prevStatus)
                             }}
-                        />
-                        <Ionicons 
-                            name='checkmark-circle-outline'
-                            size={32}
-                            color={'white'}
+                        >
+                            <Ionicons
+                                name={backgroundOpacity === 0 ? 'eye-off-outline' : 'eye-outline'}
+                                size={32}
+                                color={'white'}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            activeOpacity={1}
                             onPress={() => {
                                 addNewPhoto(image)
                                 navigation.goBack()
                             }}
-                        />
+                        >
+                            <Ionicons 
+                                name='checkmark-circle-outline'
+                                size={32}
+                                color={'white'}
+                            />
+                        </TouchableOpacity>
                     </View>
                     {settingBackgroundOpacity && 
                         <Slider 
@@ -244,9 +284,9 @@ const styles = StyleSheet.create({
     timerOpen: {
         flexDirection: 'column', 
         height: 150, 
-        backgroundColor: 'white', 
+        backgroundColor: 'rgba(255,255,255,0.75)',
         borderRadius: 15, 
-        alignItems: 'center', 
+        alignItems: 'center',
     },
     timerClosed: {
         

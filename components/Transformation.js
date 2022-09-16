@@ -4,10 +4,11 @@ import {
     StyleSheet, 
     Text, 
     ImageBackground, 
-    TouchableOpacity } from 'react-native'
+    TouchableOpacity, 
+    Alert} from 'react-native'
 import Carousel from 'react-native-snap-carousel'
 import VideoForm from './VideoForm'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Feather from '@expo/vector-icons/Feather'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
@@ -17,9 +18,14 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
 
     const {id, trackingWeight, photoObjects} = route.params
     const [currentPhotoObjects, setCurrentPhotoObjects] = useState(photoObjects)
+    const [imageToEdit, setImageToEdit] = useState(null)
     const [videoFormChanging, setVideoFormChanging] = useState(false)
     const [weightFormChanging, setWeightFormChanging] = useState(false)
     const [editing, setEditing] = useState(false)
+
+    useEffect(() => {
+        setImageToEdit(currentPhotoObjects.at(0)?.image)
+    }, [currentPhotoObjects])
 
     const handleVideoFormChange = () => {
         setVideoFormChanging(prevStatus => !prevStatus)
@@ -29,10 +35,10 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
         setWeightFormChanging(prevStatus => !prevStatus)
     }
 
-    const createVideo = (secondsPerPhoto, previewOrRecord) => {
+    const createVideo = (millisecondsPerPhoto, previewOrRecord) => {
         navigation.navigate('Video', {
             photos: currentPhotoObjects.map(photo => photo.image),
-            millisecondsPerPhoto: secondsPerPhoto * 1000,
+            millisecondsPerPhoto: millisecondsPerPhoto,
             previewOrRecord: previewOrRecord
         })
     }
@@ -82,7 +88,7 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                 handleWeightFormChange={handleWeightFormChange}
                 weightLabel={trackingWeight}
                 editPhotoWeight={editPhotoWeight}
-                image={currentPhotoObjects.at(0)?.image}
+                image={imageToEdit}
             />
             <View style={styles.photoBlockContainer}>
                 {currentPhotoObjects.length > 0 ?
@@ -93,7 +99,6 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                     sliderWidth={400}
                     itemWidth={260}
                     inactiveSlideOpacity={0.4} 
-                    //autoplay={true}
                     renderItem={({item}) => {
                         return (
                             <View>
@@ -105,15 +110,26 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                                     onPress={() => deletePhoto(item.image)}
                                 />
                                 :
-                                <View style={{height: 24.2}}/>
+                                <View style={{height: 24.1}}/>
                                 }
-                                <View style={{alignItems: 'center'}}>
-                                    <Image source={{uri: item.image}} 
-                                    style={{width:250, height:500, borderRadius: 20, marginBottom: 30}}
-                                    />
-                                    <Text style={{color: 'white', fontSize: 14, fontWeight: '200'}}>{item.date}</Text>
-                                    {item.weight && <Text style={{color: 'white', fontSize: 14, fontWeight: '200', paddingTop: 10}}>{item.weight}</Text>}
-                                </View>
+                                <TouchableOpacity 
+                                    activeOpacity={1}
+                                    style={{alignItems: 'center', paddingTop: 10}}
+                                    onPress={() => {
+                                        editing && setImageToEdit(item.image)
+                                        if(trackingWeight && editing){
+                                            setWeightFormChanging(true)
+                                        }
+                                    }}
+                                >
+                                    <View style={styles.imageItemContainer}>
+                                        <Image source={{uri: item.image}} 
+                                        style={{width:250, height:500, borderRadius: 20, marginBottom: 30}}
+                                        />
+                                    </View>
+                                    <Text style={styles.photoCaption}>{item.date}</Text>
+                                    {item.weight && <Text style={[styles.photoCaption, {paddingTop: 10}]}>{item.weight}</Text>}
+                                </TouchableOpacity>
                             </View>
                         )
                     }}
@@ -121,29 +137,22 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                 :
                 <View style={{alignItems: 'center'}}>
                     <View 
-                        style={ 
-                            { justifyContent: 'center', 
-                            borderWidth: 1, borderRadius: 20, borderColor: 'white',
-                            width: 250, 
-                            height: 500, 
-                            marginHorizontal: 25,
-                            marginVertical: 50,
-                         }}
+                        style={[styles.emptyImageContainer, styles.imageItemContainer]}
                     >
                         <MaterialIcons 
                             name='insert-photo' 
                             size={250} 
                             color={'white'}
                         />
-                        
                     </View>
-                    <Text style={{color: 'white', fontSize: 14, fontWeight: '200'}}>No Photos</Text>
+                    <Text style={styles.photoCaption}>No Photos</Text>
                 </View>
                 }
             </View>
 
             <View style={styles.footerContainer}>
                 <TouchableOpacity
+                    activeOpacity={1}
                     style={styles.footerItem}
                     onPress={() => navigation.goBack()}
                 >
@@ -154,6 +163,7 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                     />
                 </TouchableOpacity>
                 <TouchableOpacity
+                    activeOpacity={1}
                     style={styles.footerItem}
                     onPress={() => setEditing(prevStatus => !prevStatus)}
                 >
@@ -164,6 +174,7 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                     />
                 </TouchableOpacity>
                 <TouchableOpacity 
+                    activeOpacity={1}
                     style={styles.footerItem}
                     onPress={() => navigation.navigate('Camera', {
                         lastPhoto: currentPhotoObjects.at(0)?.image,
@@ -177,8 +188,13 @@ export default function Transformation({navigation, updatePhotoObjects, route}) 
                     />
                 </TouchableOpacity>
                 <TouchableOpacity 
+                    activeOpacity={1}
                     style={styles.footerItem}
-                    onPress={() => handleVideoFormChange()}
+                    onPress={() => {
+                        currentPhotoObjects.length === 0 ?
+                        alert("You need photos to create a video!") :
+                        handleVideoFormChange()
+                    }}
                 >
                     <Ionicons 
                         name='ios-videocam-outline' 
@@ -203,14 +219,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center', 
         alignItems:'center',
     },
-    previewTextBox: {
-        backgroundColor: 'white',
-        padding: 10,
-        borderRadius: 10,
+    imageItemContainer: {
         shadowOpacity: 0.8, 
         shadowRadius: 2, 
         shadowOffset:{width:1}, 
         shadowColor: 'white'
+    },
+    emptyImageContainer: {
+        width: 250, 
+        height: 500, 
+        justifyContent: 'center', 
+        borderWidth: 1, 
+        borderRadius: 20, 
+        borderColor: 'white',
+        marginVertical: 50
+    },
+    photoCaption: {
+        color: 'white', 
+        fontSize: 14, 
+        fontWeight: '200'
     },
     footerContainer: {
         flex: 1,

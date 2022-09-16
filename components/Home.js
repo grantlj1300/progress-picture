@@ -13,21 +13,20 @@ import Carousel from 'react-native-snap-carousel'
 import uuid from 'react-native-uuid'
 import { useState } from 'react'
 
-export default function Home({navigation, transformations, updateTransformations, expoPushToken, sendPushNotification}) {
+export default function Home({ navigation, transformations, updateTransformations }) {
 
     const [editing, setEditing] = useState(false)
     const [itemToEdit, setItemToEdit] = useState(null)
     const [displayTransformationForm, setDisplayTransformationForm] = useState(false)
     const [currentIndex, setCurrentIndex] = useState(0)
 
-    const addNewTransformation = (newName, newDays, newWeight) => {
+    const addNewTransformation = (newName, newWeight) => {
         const today = new Date()
         const currDate = parseInt(today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear()
         const newTransformations = [
         {
             id: uuid.v4(),
             name: newName, 
-            daysBetweenPhotos: newDays,
             startDate: currDate, 
             weight: newWeight,
             photoObjects: []
@@ -43,10 +42,10 @@ export default function Home({navigation, transformations, updateTransformations
         updateTransformations(newTransformations)
     }
 
-    const editTransformation = (transId, transName, transDays, transWeight) => {
+    const editTransformation = (transId, transName, transWeight) => {
         const newTransformations = transformations.map(transformation => {
             if(transformation.id === transId){
-                return {...transformation, name: transName, daysBetweenPhotos: transDays, weight: transWeight}
+                return {...transformation, name: transName, weight: transWeight}
             }
             else{
                 return transformation
@@ -115,22 +114,12 @@ export default function Home({navigation, transformations, updateTransformations
                 )
             default:
                 return (
-                    <View 
-                        style={[styles.imageStackContainer, 
-                            { justifyContent: 'center', alignItems: 'center', 
-                            borderWidth: 1, borderRadius: 20, borderColor: 'white',
-                            width: 200, 
-                            height: 400, 
-                            marginHorizontal: 25,
-                            marginVertical: 50,
-                         }]}
-                    >
+                    <View style={[styles.imageStackContainer, styles.emptyImageContainer]}>
                         <MaterialIcons 
                             name='photo-album' 
                             size={200} 
                             color={'white'}
-                        />
-                        
+                        /> 
                     </View>
                 )
         }
@@ -155,9 +144,8 @@ export default function Home({navigation, transformations, updateTransformations
                     data={transformations}
                     sliderWidth={400}
                     itemWidth={250}
-                    inactiveSlideOpacity={0.4}                    
-                    onSnapToItem={(index) => setCurrentIndex(index)}
-                    renderItem={({item, index}) => {
+                    inactiveSlideOpacity={0.4}
+                    renderItem={({item}) => {
                     return  (
                         <View>
                             {editing ? 
@@ -191,7 +179,6 @@ export default function Home({navigation, transformations, updateTransformations
                                     else{
                                         navigation.navigate('Transformation', {
                                             id: item.id,
-                                            daysBetweenPhotos: item.daysBetweenPhotos,
                                             startDate: item.startDate,
                                             photoObjects: item.photoObjects,
                                             trackingWeight: item.weight
@@ -201,9 +188,9 @@ export default function Home({navigation, transformations, updateTransformations
                             } 
                                 style={{alignItems:'center'}}
                             >
-                                <Text style={{fontWeight: 'bold', color: 'white', fontSize: 24}}>{item.name}</Text>
+                                <Text style={styles.headerText}>{item.name}</Text>
                                 {generateCards(item.photoObjects.slice(0, 3))}
-                                <Text style={{color: 'white', fontSize: 14, fontWeight: '200'}}>Created: {item.startDate}</Text>
+                                <Text style={styles.captionText}>Created: {item.startDate}</Text>
                             </TouchableOpacity>
                         </View>
                     )}}
@@ -212,7 +199,7 @@ export default function Home({navigation, transformations, updateTransformations
             :
             <View style={styles.previewContainer}>
                 <View style={{alignItems: 'center'}}>
-                    <Text style={{fontWeight: 'bold', color: 'white', fontSize: 24}}>No Collections</Text>
+                    <Text style={styles.headerText}>No Collections</Text>
                     {generateCards([])}
                 </View>
             </View>
@@ -262,9 +249,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems:'center'
     },
-    previewItem: {
-        borderWidth:1,
-        borderColor: 'white'
+    headerText: {
+        fontWeight: 'bold', 
+        color: 'white', 
+        fontSize: 24
+    },
+    captionText: {
+        color: 'white', 
+        fontSize: 14, 
+        fontWeight: '200'
     },
     imageStackContainer: {
         width: 250, 
@@ -274,18 +267,19 @@ const styles = StyleSheet.create({
         shadowOffset:{width:1}, 
         shadowColor: 'white'
     },
+    emptyImageContainer: {
+        width: 200, 
+        height: 400, 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        borderWidth: 1, 
+        borderRadius: 20, 
+        borderColor: 'white',
+        marginVertical: 50
+    },
     imageSizing: {
         width: 200, 
         height: 400
-    },
-    previewTextBox: {
-        backgroundColor: 'white',
-        padding: 10,
-        borderRadius: 10,
-        shadowOpacity: 0.8, 
-        shadowRadius: 2, 
-        shadowOffset:{width:1}, 
-        shadowColor: 'white'
     },
     footerContainer: {
         flex: 1,

@@ -7,7 +7,7 @@ export default function VideoScreen({route, navigation}) {
     const { photos, millisecondsPerPhoto, previewOrRecord } = route.params
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(photos.length - 1)
     const [playingVideo, setPlayingVideo] = useState(false)
-
+    
     useEffect(() => {
         let intervalId
         if(playingVideo){
